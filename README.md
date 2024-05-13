@@ -12,7 +12,7 @@ Este proyecto fue creado con [Create React App](https://github.com/facebook/crea
 
 ## Acerca de Wormtech Biomass
 
-Wormtech Biomass es el resultado de mi Trabajo de Fin de Grado para el Grado de Aplicaciones Multiplataforma. Este proyecto tiene como objetivo principal proporcionar una solución eficiente para el control de una planta de reciclaje, permitiendo a los usuarios administrar y monitorear diferentes aspectos de la planta de manera efectiva.
+Wormtech Biomass es el resultado del Trabajo de Fin de Grado para el Grado de Aplicaciones Multiplataforma. Este proyecto tiene como objetivo principal proporcionar una solución eficiente para el control de una planta de reciclaje, permitiendo a los usuarios administrar y monitorear diferentes aspectos de la planta de manera efectiva.
 
 Características Principales:
 
