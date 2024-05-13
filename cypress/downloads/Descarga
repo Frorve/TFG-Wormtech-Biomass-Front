@@ -1,0 +1,10 @@
+                       {/* <div className='input-box'>
+                            <div className="info-box">
+                                <span>Autor:</span>
+                                <input type="text"
+                                    value={author}
+                                    onChange={handleAutorChange}
+                                    placeholder='Autor del proyecto'
+                                    required />
+                            </div>
+                        </div> */}
