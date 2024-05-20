@@ -1,10 +1,22 @@
 import React, { useState, useEffect } from "react";
 import logo from "../../assets/logo.png";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import Bascula from "../components/BasculaComponent/Bascula";
 import Clientes from "../components/ClienteComponent/Clientes";
 
 export default function Home() {
+
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("username");
+      localStorage.removeItem("rememberedUsername");
+      localStorage.removeItem("rememberedPassword");
+      localStorage.removeItem("rememberMe");
+      navigate("/login");
+    };
     const { username } = useParams();
     const [dateTime, setDateTime] = useState(new Date());
     const [view, setView] = useState("clientes");
@@ -32,8 +44,8 @@ export default function Home() {
             <div className="w-64 bg-white p-5">
                 <div className="mb-5">
                     <div className="flex-1">
-                        <Link to={`/home/`} className="btn btn-ghost">
-                            <img className="logo-nav" src={logo} alt="Logo" />
+                        <Link to={`/home/${username}`} className="btn btn-ghost max-w-max">
+                            <img className="h-auto" src={logo} alt="Logo" />
                         </Link>
                     </div>
                 </div>
@@ -63,7 +75,7 @@ export default function Home() {
                             />
                             <span>{username}</span>
                         </div>
-                        <button className="bg-red-500 text-white rounded-lg py-1 px-2">Cerrar sesión</button>
+                        <button className="bg-red-500 text-white rounded-lg py-1 px-2" onClick={handleLogout}>Cerrar sesión</button>
                     </div>
                 </div>
                 {view === "bascula" ? <Bascula /> : <Clientes />}

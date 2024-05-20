@@ -1,18 +1,14 @@
 import React, { useState } from "react";
-import "../components/styles/Register.css";
-import { FaUser, FaLock } from "react-icons/fa";
-import { GrMail } from "react-icons/gr";
 import { Link } from "react-router-dom";
 import logo from "../../assets/logo.png";
-import Footer from "../components/FooterComponent/Footer";
 import * as api from "../api/api";
 
 const Register = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [mail, setMail] = useState("");
-  const [errorMessage] = useState("");
-  const [userCreatedMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [userCreatedMessage, setUserCreatedMessage] = useState("");
 
   const handleUsernameChange = (event) => {
     setUsername(event.target.value);
@@ -26,16 +22,7 @@ const Register = () => {
     setMail(event.target.value);
   };
 
-  const handleSubmit = async (
-    username,
-    mail,
-    password,
-    setUsername,
-    setMail,
-    setPassword,
-    setUserCreatedMessage,
-    setErrorMessage
-  ) => {
+  const handleSubmit = async () => {
     try {
       const response = await api.registerUser(username, mail, password);
 
@@ -64,93 +51,75 @@ const Register = () => {
   };
 
   return (
-    <div>
-      <div className="wrapper">
-        <img className="logo" src={logo} alt="" />
-        <form onSubmit={handleSubmit}>
-          <h1>Crear Cuenta</h1>
-          <div className="input-box">
+    <div className="flex justify-center items-center h-screen">
+      <div className="bg-white p-8 rounded-lg shadow-lg">
+        <img className="mx-auto mb-8" src={logo} alt="Logo" />
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <h1 className="text-center text-3xl">Crear Cuenta</h1>
+          <br />
+          <div>
+          <label className="block mb-2 text-sm" htmlFor="username">Nombre de Usuario</label>
             <input
               type="text"
-              placeholder="Nombre de usuario"
+              className="w-full rounded border-gray-300 focus:border-pink-500 focus:ring focus:ring-pink-500 focus:ring-opacity-50"
+              placeholder="Usuario"
               value={username}
               onChange={handleUsernameChange}
               maxLength={30}
               required
             />
-            <FaUser className="icon" />
           </div>
-          <div className="input-box">
+
+          <div>
+          <label className="block mb-2 text-sm" htmlFor="mail">Correo electrónico</label>
             <input
               type="email"
+              className="w-full rounded border-gray-300 focus:border-pink-500 focus:ring focus:ring-pink-500 focus:ring-opacity-50"
               placeholder="Correo electrónico"
               value={mail}
               onChange={handleMailChange}
               maxLength={30}
               required
             />
-            <GrMail className="icon" />
           </div>
-          <div className="input-box">
+
+          <div>
+          <label className="block mb-2 text-sm" htmlFor="password">Contraseña</label>
             <input
               type="password"
+              className="w-full rounded border-gray-300 focus:border-pink-500 focus:ring focus:ring-pink-500 focus:ring-opacity-50"
               placeholder="Contraseña"
               value={password}
               onChange={handlePasswordChange}
               maxLength={20}
               required
             />
-            <FaLock className="icon" />
           </div>
 
           {errorMessage && (
             <div role="alert" className="alert alert-error">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="stroke-current shrink-0 h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
               <span>{errorMessage}</span>
             </div>
           )}
+
           {userCreatedMessage && (
             <div role="alert" className="alert alert-success">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="stroke-current shrink-0 h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
               <span>{userCreatedMessage}</span>
             </div>
           )}
-          <br />
-          <button type="submit">Crear Usuario</button>
 
-          <div className="register-link">
-            <p>
-              ¿Tienes ya una cuenta creada?{" "}
-              <Link to="/login">Iniciar Sesión</Link>
-            </p>
+          <button
+            type="submit"
+            className="w-full py-2 bg-green-500 text-white rounded focus:outline-none focus:ring focus:ring-pink-400"
+          >
+            Crear Usuario
+          </button>
+
+          <div className="text-center text-sm">
+            <p>¿Tienes ya una cuenta creada?{" "}<Link to="/login" className="text-black font-semibold">Iniciar Sesión</Link></p>
           </div>
         </form>
       </div>
-      <Footer />
     </div>
   );
 };

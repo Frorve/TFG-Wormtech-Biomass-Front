@@ -1,20 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "../components/styles/LoginForm.css";
-import { FaUser, FaLock } from "react-icons/fa";
-import { AiFillEye } from "react-icons/ai";
 import logo from "../../assets/logo.png";
-import Footer from "../components/FooterComponent/Footer";
 import * as api from "../api/api";
 
 const LoginForm = () => {
   const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [showEyeIcon, setShowEyeIcon] = useState(false);
 
   useEffect(() => {
     const storedUsername = localStorage.getItem("rememberedUsername");
@@ -30,15 +24,10 @@ const LoginForm = () => {
 
   const handleUsernameChange = (event) => {
     setUsername(event.target.value);
-    setShowEyeIcon(event.target.value !== "");
   };
 
   const handlePasswordChange = (event) => {
     setPassword(event.target.value);
-  };
-
-  const toggleShowPassword = () => {
-    setShowPassword(!showPassword);
   };
 
   const handleRememberMeChange = () => {
@@ -76,13 +65,17 @@ const LoginForm = () => {
   };
 
   return (
-    <div>
-      <div className="wrapper">
-        <img className="logo" src={logo} alt="" />
-        <form onSubmit={handleSubmit}>
-          <h1>Login</h1>
-          <div className="input-box">
+    <div className="flex justify-center items-center h-screen">
+      <div className="wrapper bg-white p-8 rounded-lg shadow-lg">
+        <img className="mx-auto mb-8" src={logo} alt="Logo" />
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <h1 className="text-center text-3xl">Login</h1>
+          <br />
+          <div>
+            <label className="block mb-2 text-sm" htmlFor="username">Usuario</label>
             <input
+              id="username"
+              className="w-full rounded border-gray-300 focus:border-pink-500 focus:ring focus:ring-pink-500 focus:ring-opacity-50"
               type="text"
               placeholder="Usuario"
               value={username}
@@ -90,37 +83,37 @@ const LoginForm = () => {
               maxLength={30}
               required
             />
-            <FaUser className="icon" />
           </div>
-          <div className="input-box">
+
+          <div>
+            <label className="block mb-2 text-sm" htmlFor="password">Contraseña</label>
             <input
-              type={showPassword ? "text" : "password"}
+              id="password"
+              className="w-full rounded border-gray-300 focus:border-pink-500 focus:ring focus:ring-pink-500 focus:ring-opacity-50"
+              type="password"
               placeholder="Contraseña"
               value={password}
               onChange={handlePasswordChange}
               maxLength={20}
               required
             />
-            <FaLock className="icon" />
-            {showEyeIcon && (
-              <AiFillEye className="icon" onClick={toggleShowPassword} />
-            )}
           </div>
 
-          <div className="remenber-forgot">
-            <label>
+          <div className="flex items-center justify-between">
+            <label className="text-sm">
               <input
                 type="checkbox"
                 checked={rememberMe}
                 onChange={handleRememberMeChange}
+                className="mr-2"
               />
               Recuérdame
             </label>
-            <Link to="/recuperar">¿Olvidaste la contraseña?</Link>
+            <Link to="/recuperar" className="text-sm text-black">¿Olvidaste la contraseña?</Link>
           </div>
 
           {errorMessage && (
-            <div role="alert" className="alert alert-error">
+            <div className="alert alert-error" role="alert">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="stroke-current shrink-0 h-6 w-6"
@@ -137,18 +130,16 @@ const LoginForm = () => {
               <span>{errorMessage}</span>
             </div>
           )}
-          <br />
 
-          <button type="submit">Iniciar Sesión</button>
+          <button type="submit" className="w-full py-2 bg-green-500 text-white rounded focus:outline-none focus:ring focus:ring-pink-400">
+            Iniciar Sesión
+          </button>
 
-          <div className="register-link">
-            <p>
-              ¿No tienes una cuenta? <Link to="/register">Regístrate</Link>
-            </p>
+          <div className="text-center text-sm">
+            <p>¿No tienes una cuenta? <Link to="/register" className="text-black font-semibold">Regístrate</Link></p>
           </div>
         </form>
       </div>
-      <Footer />
     </div>
   );
 };

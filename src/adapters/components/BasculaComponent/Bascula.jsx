@@ -41,9 +41,10 @@ export default function Bascula() {
                             <option>Residuo 3</option>
                         </select>
                     </div>
-                    <div className="flex items-end space-x-2">
+                    <div className="flex items-end space-x-5">
                         <button className="bg-green-500 text-white rounded py-2 px-4">Guardar</button>
                         <button className="bg-red-500 text-white rounded py-2 px-4">Cancelar</button>
+                        <button className="bg-orange-500 text-white rounded py-2 px-4">Resetear</button>
                     </div>
                 </div>
             </div>

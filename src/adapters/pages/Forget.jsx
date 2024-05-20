@@ -1,10 +1,8 @@
 import React, { useState } from "react";
-import "../components/styles/Forget.css";
+import { Link } from "react-router-dom";
 import { FaUser } from "react-icons/fa";
 import { GrMail } from "react-icons/gr";
-import { Link } from "react-router-dom";
 import logo from "../../assets/logo.png";
-import Footer from "../components/FooterComponent/Footer";
 
 const Forget = () => {
   const [username, setUsername] = useState("");
@@ -59,11 +57,11 @@ const Forget = () => {
   };
 
   return (
-    <div>
+    <div className="flex justify-center items-center h-screen">
       <div className="wrapper">
         <img className="logo" src={logo} alt="" />
         <form onSubmit={handleSubmit}>
-          <h1>Recuperar contraseña</h1>
+          <h1 className="text-3xl text-center">Recuperar contraseña</h1>
           <div className="input-box">
             <input
               type="text"
@@ -72,6 +70,7 @@ const Forget = () => {
               onChange={handleUsernameChange}
               maxLength={30}
               required
+              className="w-full h-full bg-transparent border-2 border-black/20 outline-none rounded-full text-black px-8"
             />
             <FaUser className="icon" />
           </div>
@@ -83,12 +82,13 @@ const Forget = () => {
               onChange={handleMailChange}
               maxLength={30}
               required
+              className="w-full h-full bg-transparent border-2 border-black/20 outline-none rounded-full text-black px-8"
             />
             <GrMail className="icon" />
           </div>
 
           {errorMessage && (
-            <div role="alert" className="alert alert-error">
+            <div className="alert alert-error" role="alert">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="stroke-current shrink-0 h-6 w-6"
@@ -106,7 +106,7 @@ const Forget = () => {
             </div>
           )}
           {userCreatedMessage && (
-            <div role="alert" className="alert alert-success">
+            <div className="alert alert-success" role="alert">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="stroke-current shrink-0 h-6 w-6"
@@ -124,17 +124,23 @@ const Forget = () => {
             </div>
           )}
           <br />
-          <button type="submit">Recuperar cuenta</button>
+          <button
+            type="submit"
+            className="w-full h-12 bg-black text-white rounded-full font-bold shadow-md hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900"
+          >
+            Recuperar cuenta
+          </button>
 
-          <div className="register-link">
+          <div className="register-link text-center">
             <p>
               ¿Tienes ya una cuenta creada?{" "}
-              <Link to="/login">Iniciar Sesión</Link>
+              <Link to="/login" className="text-black font-semibold">
+                Iniciar Sesión
+              </Link>
             </p>
           </div>
         </form>
       </div>
-      <Footer />
     </div>
   );
 };

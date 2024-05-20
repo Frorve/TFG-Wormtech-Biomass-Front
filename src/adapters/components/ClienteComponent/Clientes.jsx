@@ -20,7 +20,7 @@ export default function Clientes() {
     return (
         <div className="flex-1 p-5">
             <div className="flex items-center mb-5">
-                <input type="text" placeholder="Buscar ..." className="flex-1 py-2 px-4 rounded-lg border-2 border-purple-300" />
+                <input type="text" placeholder="Buscar ..." className="flex-1 py-2 px-4 rounded-lg border-2 border-black" />
             </div>
             <div>
                 {empresas.map((empresa) => (
