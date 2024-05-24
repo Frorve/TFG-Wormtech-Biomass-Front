@@ -11,8 +11,9 @@ export default function Clientes() {
 
     const fetchEmpresas = async () => {
         try {
-            const response = await axios.get("http://localhost:8080/api/v1/company");
-            setEmpresas(response.data);
+            const response = await axios.get("http://localhost:8055/items/companys");
+            console.log("Response data:", response.data); // Agrega este log
+            setEmpresas(response.data.data);
         } catch (error) {
             console.error("Error fetching empresas:", error);
         }
@@ -23,20 +24,16 @@ export default function Clientes() {
     };
 
     const handleViewMore = (id) => {
-        // Lógica para ver más detalles de la empresa
         console.log(`Ver más detalles de la empresa con ID: ${id}`);
     };
 
     const handleEdit = (id) => {
-        // Lógica para editar la empresa
         console.log(`Editar la empresa con ID: ${id}`);
     };
 
     const handleDelete = async (id) => {
-        // Lógica para eliminar la empresa
         try {
-            await axios.delete(`http://localhost:8080/api/v1/company/${id}`);
-            // Actualizar la lista de empresas después de eliminar
+            await axios.delete(`http://localhost:8055/items/companys/${id}`);
             setEmpresas(empresas.filter(empresa => empresa.id !== id));
         } catch (error) {
             console.error("Error deleting empresa:", error);
