@@ -1,146 +1,214 @@
 import React, { useState } from "react";
-import axios from "axios";
 
 export default function Bascula() {
-    const [formData, setFormData] = useState({
-        matricula: "",
-        id_cliente: "",
-        fecha_entrada: "",
-        fecha_salida: "",
-        pesaje_inicial: "",
-        pesaje_final: "",
-        pesaje_total: "",
-        residuo: ""
-    });
+  const [bascuCliente, setBascuCliente] = useState("");
+  const [bascuMatricula, setBascuMatricula] = useState("");
+  const [bascuFechaEntrada, setBascuFechaEntrada] = useState("");
+  const [bascuFechaSalida, setBascuFechaSalida] = useState("");
+  const [bascuPesajeInicial, setBascuPesajeInicial] = useState("");
+  const [bascuPesajeFinal, setBascuPesajeFinal] = useState("");
+  const [bascuPesajeTotal, setBascuPesajeTotal] = useState("");
+  const [bascuParking, setBascuParking] = useState("");
+  const [bascuResiduo, setBascuResiduo] = useState("");
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
-    };
+  const handleClienteChange = (event) => {
+    setBascuCliente(event.target.value);
+  };
 
-    const handleSubmit = async () => {
-        try {
-            const response = await axios.post("http://localhost:8055/items/bascula", { data: formData });
-            console.log("Response:", response.data);
-            // Opcional: manejar la respuesta, por ejemplo, mostrar un mensaje de éxito
-        } catch (error) {
-            console.error("Error al guardar los datos:", error);
+  const handleMatriculaChange = (event) => {
+    setBascuMatricula(event.target.value);
+  };
+
+  const handleFechaEntradaChange = (event) => {
+    setBascuFechaEntrada(event.target.value);
+  };
+
+  const handleFechaSalidaChange = (event) => {
+    setBascuFechaSalida(event.target.value);
+  };
+
+  const handlePesajeInicialChange = (event) => {
+    setBascuPesajeInicial(event.target.value);
+  };
+
+  const handlePesajeFinalChange = (event) => {
+    setBascuPesajeFinal(event.target.value);
+  };
+
+  const handlePesajeTotalChange = (event) => {
+    setBascuPesajeTotal(event.target.value);
+  };
+
+  const handleParkingChange = (event) => {
+    setBascuParking(event.target.value);
+  };
+
+  const handleResiduoChange = (event) => {
+    setBascuResiduo(event.target.value);
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const basculaInfo = {
+        matricula: bascuMatricula,
+        cliente: bascuCliente,
+        fecha_entrada: bascuFechaEntrada,
+        fecha_salida: bascuFechaSalida,
+        pesaje_inicial: bascuPesajeInicial,
+        pesaje_final: bascuPesajeFinal,
+        pesaje_total: bascuPesajeTotal,
+        parking: bascuParking,
+        residuo: bascuResiduo,
+      };
+
+      const response = await fetch(
+        "http://localhost:8055/items/registroDePesaje",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(basculaInfo),
         }
-    };
+      );
+      if (response.ok) {
+        console.log("Response:", response.data);
+      } else {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.errors[0].message || "Error al crear proyecto"
+        );
+      }
+    } catch (error) {
+      console.error("Error al guardar los datos:", error);
+    }
+  };
 
-    const handleReset = () => {
-        setFormData({
-            matricula: "",
-            id_cliente: "",
-            fecha_entrada: "",
-            fecha_salida: "",
-            pesaje_inicial: "",
-            pesaje_final: "",
-            pesaje_total: "",
-            residuo: ""
-        });
-    };
+  const handleReset = () => {
+    setBascuCliente("");
+    setBascuMatricula("");
+    setBascuFechaEntrada("");
+    setBascuFechaSalida("");
+    setBascuPesajeInicial("");
+    setBascuPesajeFinal("");
+    setBascuPesajeTotal("");
+    setBascuParking("");
+    setBascuResiduo("");
+  };
 
-    return (
-        <div className="min-h-screen bg-green-100 flex">
-            <div className="flex-1 p-5">
-                <div className="grid grid-cols-3 gap-4">
-                    <div className="flex flex-col">
-                        <label>Matrícula:</label>
-                        <input
-                            type="text"
-                            name="matricula"
-                            value={formData.matricula}
-                            onChange={handleChange}
-                            className="mb-2 p-2 border rounded"
-                        />
-                    </div>
-                    <div className="flex flex-col">
-                        <label>Cliente:</label>
-                        <input
-                            type="text"
-                            name="id_cliente"
-                            value={formData.id_cliente}
-                            onChange={handleChange}
-                            className="mb-2 p-2 border rounded"
-                        />
-                    </div>
-                    <div className="flex flex-col">
-                        <label>Fecha de entrada:</label>
-                        <input
-                            type="datetime-local"
-                            name="fecha_entrada"
-                            value={formData.fecha_entrada}
-                            onChange={handleChange}
-                            className="mb-2 p-2 border rounded"
-                        />
-                    </div>
-                    <div className="flex flex-col">
-                        <label>Fecha de salida:</label>
-                        <input
-                            type="datetime-local"
-                            name="fecha_salida"
-                            value={formData.fecha_salida}
-                            onChange={handleChange}
-                            className="mb-2 p-2 border rounded"
-                        />
-                    </div>
-                    <div className="flex flex-col">
-                        <label>Pesaje inicial:</label>
-                        <input
-                            type="number"
-                            name="pesaje_inicial"
-                            value={formData.pesaje_inicial}
-                            onChange={handleChange}
-                            className="mb-2 p-2 border rounded"
-                        />
-                    </div>
-                    <div className="flex flex-col">
-                        <label>Pesaje final:</label>
-                        <input
-                            type="number"
-                            name="pesaje_final"
-                            value={formData.pesaje_final}
-                            onChange={handleChange}
-                            className="mb-2 p-2 border rounded"
-                        />
-                    </div>
-                    <div className="flex flex-col">
-                        <label>Pesaje total:</label>
-                        <input
-                            type="number"
-                            name="pesaje_total"
-                            value={formData.pesaje_total}
-                            onChange={handleChange}
-                            className="mb-2 p-2 border rounded"
-                        />
-                    </div>
-                    <div className="flex flex-col">
-                        <label>Tipo de residuo:</label>
-                        <select
-                            name="residuo"
-                            value={formData.residuo}
-                            onChange={handleChange}
-                            className="mb-2 p-2 border rounded"
-                        >
-                            <option value="Residuo 1">Residuo 1</option>
-                            <option value="Residuo 2">Residuo 2</option>
-                            <option value="Residuo 3">Residuo 3</option>
-                        </select>
-                    </div>
-                    <div className="flex items-end space-x-5">
-                        <button onClick={handleSubmit} className="bg-green-500 text-white rounded py-2 px-4">
-                            Guardar
-                        </button>
-                        <button onClick={() => window.history.back()} className="bg-red-500 text-white rounded py-2 px-4">
-                            Cancelar
-                        </button>
-                        <button onClick={handleReset} className="bg-orange-500 text-white rounded py-2 px-4">
-                            Resetear
-                        </button>
-                    </div>
-                </div>
-            </div>
+  return (
+    <div className="min-h-screen bg-green-100 flex">
+      <div className="flex-1 p-5">
+        <div className="grid grid-cols-3 gap-4">
+          <div className="flex flex-col">
+            <label>Matrícula:</label>
+            <input
+              type="text"
+              value={bascuMatricula}
+              onChange={handleMatriculaChange}
+              className="mb-2 p-2 border rounded"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label>Cliente:</label>
+            <input
+              type="text"
+              value={bascuCliente}
+              onChange={handleClienteChange}
+              className="mb-2 p-2 border rounded"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label>Fecha de entrada:</label>
+            <input
+              type="datetime-local"
+              value={bascuFechaEntrada}
+              onChange={handleFechaEntradaChange}
+              className="mb-2 p-2 border rounded"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label>Fecha de salida:</label>
+            <input
+              type="datetime-local"
+              value={bascuFechaSalida}
+              onChange={handleFechaSalidaChange}
+              className="mb-2 p-2 border rounded"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label>Pesaje inicial:</label>
+            <input
+              type="number"
+              value={bascuPesajeInicial}
+              onChange={handlePesajeInicialChange}
+              className="mb-2 p-2 border rounded"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label>Pesaje final:</label>
+            <input
+              type="number"
+              value={bascuPesajeFinal}
+              onChange={handlePesajeFinalChange}
+              className="mb-2 p-2 border rounded"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label>Pesaje total:</label>
+            <input
+              type="number"
+              value={bascuPesajeTotal}
+              onChange={handlePesajeTotalChange}
+              className="mb-2 p-2 border rounded"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label>Parking asignado:</label>
+            <select
+              value={bascuParking}
+              onChange={handleParkingChange}
+              className="mb-2 p-2 border rounded"
+            >
+              <option value="Parking 1">Parking 1</option>
+              <option value="Parking 2">Parking 2</option>
+              <option value="Parking 3">Parking 3</option>
+            </select>
+          </div>
+          <div className="flex flex-col">
+            <label>Tipo de residuo:</label>
+            <select
+              value={bascuResiduo}
+              onChange={handleResiduoChange}
+              className="mb-2 p-2 border rounded"
+            >
+              <option value="Residuo 1">Residuo 1</option>
+              <option value="Residuo 2">Residuo 2</option>
+              <option value="Residuo 3">Residuo 3</option>
+            </select>
+          </div>
+          <div className="flex items-end space-x-5 col-span-3">
+            <button
+              onClick={handleSubmit}
+              className="bg-green-500 text-white rounded py-2 px-4"
+            >
+              Guardar
+            </button>
+            <button
+              onClick={() => window.history.back()}
+              className="bg-red-500 text-white rounded py-2 px-4"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleReset}
+              className="bg-orange-400 text-white rounded py-2 px-4"
+            >
+              Resetear
+            </button>
+          </div>
         </div>
-    );
+      </div>
+    </div>
+  );
 }

@@ -11,8 +11,8 @@ export default function Clientes() {
 
     const fetchEmpresas = async () => {
         try {
-            const response = await axios.get("http://localhost:8055/items/companys");
-            console.log("Response data:", response.data); // Agrega este log
+            const response = await axios.get("http://localhost:8055/items/empresa");
+            console.log("Response data:", response.data);
             setEmpresas(response.data.data);
         } catch (error) {
             console.error("Error fetching empresas:", error);
@@ -33,7 +33,7 @@ export default function Clientes() {
 
     const handleDelete = async (id) => {
         try {
-            await axios.delete(`http://localhost:8055/items/companys/${id}`);
+            await axios.delete(`http://localhost:8055/items/empresa/${id}`);
             setEmpresas(empresas.filter(empresa => empresa.id !== id));
         } catch (error) {
             console.error("Error deleting empresa:", error);
@@ -41,7 +41,7 @@ export default function Clientes() {
     };
 
     const filteredEmpresas = empresas.filter(empresa =>
-        empresa.name.toLowerCase().includes(searchTerm.toLowerCase())
+        empresa.nombre.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -58,16 +58,16 @@ export default function Clientes() {
             <div>
                 {filteredEmpresas.map((empresa) => (
                     <div key={empresa.id} className="bg-green-300 mb-2 py-4 px-6 rounded-lg flex items-center justify-between">
-                        <span>{empresa.name}</span>
+                        <strong><span>{empresa.nombre}</span></strong>
                         <div>
                             <button
-                                className="bg-blue-500 text-white py-1 px-2 rounded-lg mr-2"
+                                className="bg-green-500 text-white py-1 px-2 rounded-lg mr-2"
                                 onClick={() => handleViewMore(empresa.id)}
                             >
                                 Ver más
                             </button>
                             <button
-                                className="bg-yellow-500 text-white py-1 px-2 rounded-lg mr-2"
+                                className="bg-green-900 text-white py-1 px-2 rounded-lg mr-2"
                                 onClick={() => handleEdit(empresa.id)}
                             >
                                 Editar
