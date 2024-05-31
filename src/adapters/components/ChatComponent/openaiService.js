@@ -1,4 +1,4 @@
-const API_KEY = process.env.REACT_APP_CHATGPT;
+const API_KEY = "sk-proj-F0yOkVYZLIunlGdZ6o8IT3BlbkFJMgqMkKBMoOmwqmIuVHtS";
 const API_URL = "https://api.openai.com/v1/chat/completions";
 
 async function sendMessage(msg) {

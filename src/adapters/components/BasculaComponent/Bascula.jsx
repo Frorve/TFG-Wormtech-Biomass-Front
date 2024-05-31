@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 export default function Bascula() {
   const [bascuCliente, setBascuCliente] = useState("");
@@ -10,9 +11,38 @@ export default function Bascula() {
   const [bascuPesajeTotal, setBascuPesajeTotal] = useState("");
   const [bascuParking, setBascuParking] = useState("");
   const [bascuResiduo, setBascuResiduo] = useState("");
+  const [clientes, setClientes] = useState([]);
+  const [suggestions, setSuggestions] = useState([]);
+
+  useEffect(() => {
+    const fetchClientes = async () => {
+      try {
+        const response = await axios.get("http://localhost:8055/items/empresa");
+        setClientes(response.data.data);
+      } catch (error) {
+        console.error("Error al obtener los clientes:", error);
+      }
+    };
+
+    fetchClientes();
+  }, []);
 
   const handleClienteChange = (event) => {
-    setBascuCliente(event.target.value);
+    const value = event.target.value;
+    setBascuCliente(value);
+    if (value) {
+      const filteredSuggestions = clientes.filter((cliente) =>
+        cliente.nombre.toLowerCase().includes(value.toLowerCase())
+      );
+      setSuggestions(filteredSuggestions);
+    } else {
+      setSuggestions([]);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion) => {
+    setBascuCliente(suggestion.nombre);
+    setSuggestions([]);
   };
 
   const handleMatriculaChange = (event) => {
@@ -62,7 +92,7 @@ export default function Bascula() {
       };
 
       const response = await fetch(
-        "http://localhost:8055/items/registroDePesaje",
+        "http://localhost:8055/items/bascula",
         {
           method: "POST",
           headers: {
@@ -107,6 +137,7 @@ export default function Bascula() {
               value={bascuMatricula}
               onChange={handleMatriculaChange}
               className="mb-2 p-2 border rounded"
+              required
             />
           </div>
           <div className="flex flex-col">
@@ -116,7 +147,21 @@ export default function Bascula() {
               value={bascuCliente}
               onChange={handleClienteChange}
               className="mb-2 p-2 border rounded"
+              required
             />
+            {suggestions.length > 0 && (
+              <div className="border rounded bg-white shadow-md">
+                {suggestions.map((suggestion) => (
+                  <div
+                    key={suggestion.id}
+                    className="p-2 cursor-pointer hover:bg-gray-200"
+                    onClick={() => handleSuggestionClick(suggestion)}
+                  >
+                    {suggestion.nombre}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <div className="flex flex-col">
             <label>Fecha de entrada:</label>
@@ -125,6 +170,7 @@ export default function Bascula() {
               value={bascuFechaEntrada}
               onChange={handleFechaEntradaChange}
               className="mb-2 p-2 border rounded"
+              required
             />
           </div>
           <div className="flex flex-col">
@@ -134,6 +180,7 @@ export default function Bascula() {
               value={bascuFechaSalida}
               onChange={handleFechaSalidaChange}
               className="mb-2 p-2 border rounded"
+              required
             />
           </div>
           <div className="flex flex-col">
@@ -143,6 +190,7 @@ export default function Bascula() {
               value={bascuPesajeInicial}
               onChange={handlePesajeInicialChange}
               className="mb-2 p-2 border rounded"
+              required
             />
           </div>
           <div className="flex flex-col">
@@ -152,6 +200,7 @@ export default function Bascula() {
               value={bascuPesajeFinal}
               onChange={handlePesajeFinalChange}
               className="mb-2 p-2 border rounded"
+              required
             />
           </div>
           <div className="flex flex-col">
@@ -161,6 +210,7 @@ export default function Bascula() {
               value={bascuPesajeTotal}
               onChange={handlePesajeTotalChange}
               className="mb-2 p-2 border rounded"
+              required
             />
           </div>
           <div className="flex flex-col">
@@ -169,6 +219,7 @@ export default function Bascula() {
               value={bascuParking}
               onChange={handleParkingChange}
               className="mb-2 p-2 border rounded"
+              required
             >
               <option value="Parking 1">Parking 1</option>
               <option value="Parking 2">Parking 2</option>
@@ -181,6 +232,7 @@ export default function Bascula() {
               value={bascuResiduo}
               onChange={handleResiduoChange}
               className="mb-2 p-2 border rounded"
+              required
             >
               <option value="Residuo 1">Residuo 1</option>
               <option value="Residuo 2">Residuo 2</option>
@@ -193,12 +245,6 @@ export default function Bascula() {
               className="bg-green-500 text-white rounded py-2 px-4"
             >
               Guardar
-            </button>
-            <button
-              onClick={() => window.history.back()}
-              className="bg-red-500 text-white rounded py-2 px-4"
-            >
-              Cancelar
             </button>
             <button
               onClick={handleReset}
