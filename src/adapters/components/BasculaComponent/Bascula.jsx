@@ -13,6 +13,9 @@ export default function Bascula() {
   const [bascuResiduo, setBascuResiduo] = useState("");
   const [clientes, setClientes] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
+  const [entradaRegistrada, setEntradaRegistrada] = useState(false);
+  const [salidaRegistrada, setSalidaRegistrada] = useState(false);
+  const [id, setId] = useState(null); // Nueva variable de estado para almacenar el ID de la operación de bascula
 
   useEffect(() => {
     const fetchClientes = async () => {
@@ -27,6 +30,17 @@ export default function Bascula() {
     fetchClientes();
   }, []);
 
+  useEffect(() => {
+    // Calcula el pesaje total
+    const inicial = parseFloat(bascuPesajeInicial);
+    const final = parseFloat(bascuPesajeFinal);
+    if (!isNaN(inicial) && !isNaN(final)) {
+      setBascuPesajeTotal(inicial - final);
+    } else {
+      setBascuPesajeTotal("");
+    }
+  }, [bascuPesajeInicial, bascuPesajeFinal]);
+
   const handleClienteChange = (event) => {
     const value = event.target.value;
     setBascuCliente(value);
@@ -38,6 +52,20 @@ export default function Bascula() {
     } else {
       setSuggestions([]);
     }
+  };
+
+  const handleReset = () => {
+    setBascuCliente("");
+    setBascuMatricula("");
+    setBascuFechaEntrada("");
+    setBascuFechaSalida("");
+    setBascuPesajeInicial("");
+    setBascuPesajeFinal("");
+    setBascuPesajeTotal("");
+    setBascuParking("");
+    setBascuResiduo("");
+    setEntradaRegistrada(false);
+    setSalidaRegistrada(false);
   };
 
   const handleSuggestionClick = (suggestion) => {
@@ -77,53 +105,47 @@ export default function Bascula() {
     setBascuResiduo(event.target.value);
   };
 
-  const handleSubmit = async () => {
+  const handleRegistroEntrada = async () => {
     try {
       const basculaInfo = {
         matricula: bascuMatricula,
         cliente: bascuCliente,
         fecha_entrada: bascuFechaEntrada,
-        fecha_salida: bascuFechaSalida,
         pesaje_inicial: bascuPesajeInicial,
-        pesaje_final: bascuPesajeFinal,
-        pesaje_total: bascuPesajeTotal,
         parking: bascuParking,
         residuo: bascuResiduo,
       };
 
-      const response = await fetch(
-        "http://localhost:8055/items/bascula",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(basculaInfo),
-        }
-      );
-      if (response.ok) {
-        console.log("Response:", response.data);
-      } else {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.errors[0].message || "Error al crear proyecto"
-        );
+      const response = await axios.post("http://localhost:8055/items/bascula", basculaInfo);
+      if (response.status === 200) {
+        setEntradaRegistrada(true);
+        setId(response.data.data.id); // Almacena el ID de la operación de bascula
+        console.log(response.data.data.id);
+        console.log("Entrada registrada con éxito.");
       }
     } catch (error) {
-      console.error("Error al guardar los datos:", error);
+      console.error("Error al registrar la entrada:", error);
     }
   };
 
-  const handleReset = () => {
-    setBascuCliente("");
-    setBascuMatricula("");
-    setBascuFechaEntrada("");
-    setBascuFechaSalida("");
-    setBascuPesajeInicial("");
-    setBascuPesajeFinal("");
-    setBascuPesajeTotal("");
-    setBascuParking("");
-    setBascuResiduo("");
+  const handleRegistroSalida = async () => {
+    try {
+      const basculaInfo = {
+        matricula: bascuMatricula,
+        cliente: bascuCliente,
+        fecha_salida: bascuFechaSalida,
+        pesaje_final: bascuPesajeFinal,
+        pesaje_total: bascuPesajeTotal,
+      };
+
+      const response = await axios.patch(`http://localhost:8055/items/bascula/${id}`, basculaInfo);
+      if (response.status === 200) {
+        setSalidaRegistrada(true);
+        console.log("Salida registrada con éxito.");
+      }
+    } catch (error) {
+      console.error("Error al registrar la salida:", error);
+    }
   };
 
   return (
@@ -181,6 +203,7 @@ export default function Bascula() {
               onChange={handleFechaSalidaChange}
               className="mb-2 p-2 border rounded"
               required
+              disabled={!entradaRegistrada || salidaRegistrada} // Deshabilitar si no se ha registrado la entrada o ya se registró la salida
             />
           </div>
           <div className="flex flex-col">
@@ -201,6 +224,7 @@ export default function Bascula() {
               onChange={handlePesajeFinalChange}
               className="mb-2 p-2 border rounded"
               required
+              disabled={!entradaRegistrada || salidaRegistrada} // Deshabilitar si no se ha registrado la entrada o ya se registró la salida
             />
           </div>
           <div className="flex flex-col">
@@ -208,24 +232,25 @@ export default function Bascula() {
             <input
               type="number"
               value={bascuPesajeTotal}
-              onChange={handlePesajeTotalChange}
-              className="mb-2 p-2 border rounded"
-              required
+              readOnly
+              className="mb-2 p-2 border rounded bg-gray-200"
             />
           </div>
-          <div className="flex flex-col">
-            <label>Parking asignado:</label>
-            <select
-              value={bascuParking}
-              onChange={handleParkingChange}
-              className="mb-2 p-2 border rounded"
-              required
-            >
-              <option value="Parking 1">Parking 1</option>
-              <option value="Parking 2">Parking 2</option>
-              <option value="Parking 3">Parking 3</option>
-            </select>
-          </div>
+          {bascuResiduo !== "Compost" && (
+            <div className="flex flex-col">
+              <label>Parking asignado:</label>
+              <select
+                value={bascuParking}
+                onChange={handleParkingChange}
+                className="mb-2 p-2 border rounded"
+                required
+              >
+                <option value="Parking 1">Parking 1</option>
+                <option value="Parking 2">Parking 2</option>
+                <option value="Parking 3">Parking 3</option>
+              </select>
+            </div>
+          )}
           <div className="flex flex-col">
             <label>Tipo de residuo:</label>
             <select
@@ -234,21 +259,31 @@ export default function Bascula() {
               className="mb-2 p-2 border rounded"
               required
             >
-              <option value="Residuo 1">Residuo 1</option>
-              <option value="Residuo 2">Residuo 2</option>
-              <option value="Residuo 3">Residuo 3</option>
+              <option value="RResiduo 1 - Restos vegetales">Residuo 1 - Restos vegetales</option>
+              <option value="Residuo 2 - Material de construcción">Residuo 2 - Material de construcción</option>
+              <option value="Residuo 3 - Plástico">Residuo 3 - Plástico</option>
+              <option value="Residuo 4 - Tierra">Residuo 4 - Tierra</option>
+              <option value="Residuo 5 - Mezcla de residuos">Residuo 5 - Mezcla de residuos</option>
+              <option value="Compost">Compost</option>
             </select>
           </div>
           <div className="flex items-end space-x-5 col-span-3">
             <button
-              onClick={handleSubmit}
+              onClick={handleRegistroEntrada}
               className="bg-green-500 text-white rounded py-2 px-4"
             >
-              Guardar
+              Registrar Entrada
+            </button>
+            <button
+              onClick={handleRegistroSalida}
+              className="bg-green-900 text-white rounded py-2 px-4"
+              disabled={!entradaRegistrada || salidaRegistrada} // Deshabilitar si no se ha registrado la entrada o ya se registró la salida
+            >
+              Registrar Salida
             </button>
             <button
               onClick={handleReset}
-              className="bg-orange-400 text-white rounded py-2 px-4"
+              className="bg-red-500 text-white rounded py-2 px-4"
             >
               Resetear
             </button>

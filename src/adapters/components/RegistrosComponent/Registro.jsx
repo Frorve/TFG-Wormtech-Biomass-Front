@@ -8,6 +8,7 @@ moment.locale('es');
 export default function Registro() {
   const [registros, setRegistros] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [filterType, setFilterType] = useState("cliente"); // Default filter type
   const [selectedRegistro, setSelectedRegistro] = useState(null);
 
   useEffect(() => {
@@ -17,7 +18,8 @@ export default function Registro() {
   const fetchRegistros = async () => {
     try {
       const response = await axios.get("http://localhost:8055/items/bascula");
-      setRegistros(response.data.data);
+      const sortedRegistros = response.data.data.sort((a, b) => new Date(b.fecha_entrada) - new Date(a.fecha_entrada));
+      setRegistros(sortedRegistros);
     } catch (error) {
       console.error("Error fetching registros:", error);
     }
@@ -27,14 +29,23 @@ export default function Registro() {
     setSearchTerm(event.target.value);
   };
 
+  const handleFilterTypeChange = (event) => {
+    setFilterType(event.target.value);
+  };
+
   const handleViewMore = (registro) => {
     setSelectedRegistro(registro);
     document.getElementById("my_modal_4").showModal();
   };
 
-  const filteredRegistros = registros.filter((registro) =>
-    registro.cliente.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredRegistros = registros.filter((registro) => {
+    if (filterType === "cliente") {
+      return registro.cliente.toLowerCase().includes(searchTerm.toLowerCase());
+    } else if (filterType === "mes") {
+      return moment(registro.fecha_entrada).format("MMMM").toLowerCase().includes(searchTerm.toLowerCase());
+    }
+    return true;
+  });
 
   const groupedRegistros = filteredRegistros.reduce((acc, registro) => {
     const date = moment(registro.fecha_entrada).format("YYYY-MM-DD");
@@ -48,6 +59,14 @@ export default function Registro() {
   return (
     <div className="flex-1 p-5">
       <div className="flex items-center mb-5">
+        <select
+          value={filterType}
+          onChange={handleFilterTypeChange}
+          className="py-2 px-4 rounded-lg border-2 border-black mr-4"
+        >
+          <option value="cliente">Filtrar por Cliente</option>
+          <option value="mes">Filtrar por Mes</option>
+        </select>
         <input
           type="text"
           placeholder="Buscar ..."
