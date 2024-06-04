@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import moment from "moment";
-import 'moment/locale/es';
+import "moment/locale/es";
 
-moment.locale('es');
+moment.locale("es");
 
 export default function Registro() {
   const [registros, setRegistros] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterType, setFilterType] = useState("cliente"); // Default filter type
+  const [filterType, setFilterType] = useState("cliente");
   const [selectedRegistro, setSelectedRegistro] = useState(null);
 
   useEffect(() => {
@@ -18,7 +18,9 @@ export default function Registro() {
   const fetchRegistros = async () => {
     try {
       const response = await axios.get("http://localhost:8055/items/bascula");
-      const sortedRegistros = response.data.data.sort((a, b) => new Date(b.fecha_entrada) - new Date(a.fecha_entrada));
+      const sortedRegistros = response.data.data.sort(
+        (a, b) => new Date(b.fecha_entrada) - new Date(a.fecha_entrada)
+      );
       setRegistros(sortedRegistros);
     } catch (error) {
       console.error("Error fetching registros:", error);
@@ -39,10 +41,16 @@ export default function Registro() {
   };
 
   const filteredRegistros = registros.filter((registro) => {
+    if (!registro.pesaje_total) {
+      return false;
+    }
     if (filterType === "cliente") {
       return registro.cliente.toLowerCase().includes(searchTerm.toLowerCase());
     } else if (filterType === "mes") {
-      return moment(registro.fecha_entrada).format("MMMM").toLowerCase().includes(searchTerm.toLowerCase());
+      return moment(registro.fecha_entrada)
+        .format("MMMM")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
     }
     return true;
   });
@@ -78,25 +86,27 @@ export default function Registro() {
       <div className="flex flex-col">
         {Object.keys(groupedRegistros).map((date) => (
           <div key={date} className="mb-5">
-            <h3 className="text-lg font-bold mb-2">{moment(date).format("LL")}</h3>
+            <h3 className="text-lg font-bold mb-2">
+              {moment(date).format("LL")}
+            </h3>
             {groupedRegistros[date].map((registro) => (
               <div
                 key={registro.id}
                 className="bg-green-300 mb-2 mr-2 py-4 px-6 rounded-lg flex-1 flex flex-row justify-between"
               >
-                <div className="mr-2">
+                <div className="flex-1 min-w-[150px] mr-2">
                   <small>Cliente</small>
-                  <div className="font-bold">{registro.cliente}</div>
+                  <div className="font-bold truncate">{registro.cliente}</div>
                 </div>
-                <div className="mr-2">
+                <div className="flex-1 min-w-[150px] mr-2">
                   <small>Matrícula</small>
-                  <div className="font-bold">{registro.matricula}</div>
+                  <div className="font-bold truncate">{registro.matricula}</div>
                 </div>
-                <div className="mr-2">
+                <div className="flex-1 min-w-[150px] mr-2">
                   <small>Pesaje Total</small>
-                  <div className="font-bold">{registro.pesaje_total}</div>
+                  <div className="font-bold truncate">{registro.pesaje_total}</div>
                 </div>
-                <div>
+                <div className="flex-none">
                   <button
                     className="bg-green-500 text-white py-1 px-2 rounded-lg mr-2 mt-1.5"
                     onClick={() => handleViewMore(registro)}

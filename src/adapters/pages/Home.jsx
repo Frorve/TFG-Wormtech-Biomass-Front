@@ -50,8 +50,16 @@ export default function Home() {
       <div className="w-64 bg-white p-5">
         <div className="mb-10">
           <div className="flex-1">
-            <Link to={`/home/${username}`} className="btn btn-ghost max-w-max h-20">
-              <img className="h-auto" src={logo} alt="Logo" onClick={handleLogoClick} />
+            <Link
+              to={`/home/${username}`}
+              className="btn btn-ghost max-w-max h-20"
+            >
+              <img
+                className="h-auto"
+                src={logo}
+                alt="Logo"
+                onClick={handleLogoClick}
+              />
             </Link>
           </div>
         </div>
@@ -82,7 +90,6 @@ export default function Home() {
           </li>
         </ul>
       </div>
-
       <div className="flex-1 p-5">
         <div className="flex justify-between items-center mb-5">
           <h1 className="text-xl font-bold">
@@ -92,14 +99,6 @@ export default function Home() {
               ? "Clientes"
               : "Registros"}
           </h1>
-          {/* {view === "clientes" && (
-            <button
-              className="bg-green-500 text-white rounded-lg py-2 px-4 mb-0"
-              onClick={handleAddClient}
-            >
-              Añadir Cliente
-            </button>
-          )} */}
           <div className="flex items-center space-x-3">
             <div className="text-black">{formatDate(dateTime)}</div>
             <div className="bg-green-500 text-white rounded-lg py-1 px-2 flex items-center">
@@ -118,7 +117,6 @@ export default function Home() {
             </button>
           </div>
         </div>
-
         {view === "bascula" ? (
           <Bascula />
         ) : view === "clientes" ? (

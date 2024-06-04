@@ -16,6 +16,8 @@ export default function Bascula() {
   const [entradaRegistrada, setEntradaRegistrada] = useState(false);
   const [salidaRegistrada, setSalidaRegistrada] = useState(false);
   const [id, setId] = useState(null);
+  const [userCreatedMessage, setUserCreatedMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const [registrosPendientes, setRegistrosPendientes] = useState(() => {
     const storedPendientes = localStorage.getItem("registrosPendientes");
@@ -38,27 +40,24 @@ export default function Bascula() {
     return now.toISOString();
   }
 
+  const fetchRegistrosBascula = async () => {
+    try {
+      const response = await axios.get("http://localhost:8055/items/bascula");
+      const basculaRecords = response.data.data;
+
+      // Filtra los registros pendientes (sin fecha de salida)
+      const pendingRecords = basculaRecords.filter(
+        (record) => !record.fecha_salida
+      );
+      setRegistrosPendientes(pendingRecords);
+    } catch (error) {
+      console.error("Error al obtener los registros de báscula:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchRegistrosBascula = async () => {
-      try {
-        const response = await axios.get("http://localhost:8055/items/bascula");
-        const basculaRecords = response.data.data;
-
-        // Filtra los registros pendientes (sin fecha de salida)
-        const pendingRecords = basculaRecords.filter(
-          (record) => !record.fecha_salida
-        );
-        setRegistrosPendientes(pendingRecords);
-      } catch (error) {
-        console.error("Error al obtener los registros de báscula:", error);
-      }
-    };
-
     fetchRegistrosBascula();
   }, []);
-
-  useEffect(() => {
-  }, [registrosPendientes]);
 
   useEffect(() => {
     const fetchClientes = async () => {
@@ -77,11 +76,15 @@ export default function Bascula() {
     const inicial = parseFloat(bascuPesajeInicial);
     const final = parseFloat(bascuPesajeFinal);
     if (!isNaN(inicial) && !isNaN(final)) {
-      setBascuPesajeTotal(inicial - final);
+      if (bascuResiduo === "Compost") {
+        setBascuPesajeTotal(final - inicial);
+      } else {
+        setBascuPesajeTotal(inicial - final);
+      }
     } else {
       setBascuPesajeTotal("");
     }
-  }, [bascuPesajeInicial, bascuPesajeFinal]);
+  }, [bascuPesajeInicial, bascuPesajeFinal, bascuResiduo]);
 
   const handleClienteChange = (event) => {
     const value = event.target.value;
@@ -164,11 +167,16 @@ export default function Bascula() {
         );
         setRegistrosPendientes(updatedPendingRecords);
         updateLocalStorage();
+        fetchRegistrosBascula();
         handleReset();
+        setUserCreatedMessage("Registro de entrada creado correctamente");
+        setTimeout(() => setUserCreatedMessage(""), 2000);
         console.log("Entrada registrada con éxito.");
       }
     } catch (error) {
       console.error("Error al registrar la entrada:", error);
+      setErrorMessage("Error al crear el registro de entrada");
+      setTimeout(() => setErrorMessage(""), 2000);
     }
   };
 
@@ -196,13 +204,19 @@ export default function Bascula() {
           (record) => record.id !== id
         );
         setRegistrosPendientes(updatedPendingRecords);
+        fetchRegistrosBascula();
         handleReset();
+        setUserCreatedMessage("Registro de salida creado correctamente");
+        setTimeout(() => setUserCreatedMessage(""), 2000);
         console.log("Salida registrada con éxito.");
       }
     } catch (error) {
       console.error("Error al registrar la salida:", error);
+      setErrorMessage("Error al crear el registro de salida");
+      setTimeout(() => setErrorMessage(""), 2000);
     }
   };
+
   const handleRegistroPendienteClick = (registro) => {
     setBascuCliente(registro.cliente);
     setBascuMatricula(registro.matricula);
@@ -340,8 +354,47 @@ export default function Bascula() {
             </button>
           </div>
         </div>
+
+        {userCreatedMessage && (
+          <div role="alert" className="alert alert-success mt-5">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="stroke-current shrink-0 h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span>{userCreatedMessage}</span>
+          </div>
+        )}
+
+        {errorMessage && (
+          <div role="alert" className="alert alert-error mt-5">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="stroke-current shrink-0 h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span>{errorMessage}</span>
+          </div>
+        )}
+
         <div className="mt-6">
-          <h2 className="bg-green-600 text-white rounded py-2 px-4 text-center">
+          <h2 className="bg-green-600 text-white rounded py-2 px-4 text-center mb-6">
             <strong>Registros Pendientes</strong>
           </h2>
           <ul className="mt-2">
@@ -351,18 +404,22 @@ export default function Bascula() {
                 onClick={() => handleRegistroPendienteClick(registro)}
                 className="cursor-pointer bg-green-300 mb-2 py-4 px-6 rounded-lg flex items-center justify-between"
               >
-                <span style={{ fontSize: "12px", fontWeight: "normal" }}>
-                  Matrícula:
-                </span>
-                <strong>{registro.matricula}</strong>
-                <span style={{ fontSize: "12px", fontWeight: "normal" }}>
-                  Cliente:
-                </span>
-                <strong>{registro.cliente}</strong>
-                <span style={{ fontSize: "12px", fontWeight: "normal" }}>
-                  Fecha de entrada:
-                </span>
-                <strong>{registro.fecha_entrada}</strong>
+                <div className="flex-1 min-w-[100px] mr-2">
+                  <span className="text-xs font-normal">Matrícula:</span>
+                  <strong className="block truncate">
+                    {registro.matricula}
+                  </strong>
+                </div>
+                <div className="flex-1 min-w-[100px] mr-2">
+                  <span className="text-xs font-normal">Cliente:</span>
+                  <strong className="block truncate">{registro.cliente}</strong>
+                </div>
+                <div className="flex-1 min-w-[100px] mr-2">
+                  <span className="text-xs font-normal">Fecha de entrada:</span>
+                  <strong className="block truncate">
+                    {registro.fecha_entrada}
+                  </strong>
+                </div>
               </li>
             ))}
           </ul>

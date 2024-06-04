@@ -25,21 +25,18 @@ const Register = () => {
     event.preventDefault();
 
     try {
-      const response = await fetch(
-        `http://localhost:8055/users`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            first_name: username,
-            role: "681c9169-2534-4f7a-a853-b0e372eeaefb",
-            password: password,
-            email: mail,
-          }),
-        }
-      );
+      const response = await fetch(`http://localhost:8055/users`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          first_name: username,
+          role: "681c9169-2534-4f7a-a853-b0e372eeaefb",
+          password: password,
+          email: mail,
+        }),
+      });
 
       if (response.ok) {
         console.log("Usuario creado exitosamente");
@@ -49,20 +46,17 @@ const Register = () => {
         setUserCreatedMessage("Usuario creado correctamente");
         setTimeout(() => setUserCreatedMessage(""), 5000);
 
-        const responseStaff = await fetch(
-          `http://localhost:8055/items/staff`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              nombre: username,
-              cargo: "Staff",
-              correoElectronico: mail,
-            }),
-          }
-        );
+        const responseStaff = await fetch(`http://localhost:8055/items/staff`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            nombre: username,
+            cargo: "Staff",
+            correoElectronico: mail,
+          }),
+        });
 
         if (responseStaff.ok) {
           console.log("Operación añadir Staff realizada con éxito");
@@ -89,7 +83,9 @@ const Register = () => {
       <div className="bg-white p-8 rounded-lg shadow-lg">
         <img className="mx-auto mb-2" src={logo} alt="Logo" />
         <form onSubmit={handleSubmit} className="space-y-4">
-          <strong><h1 className="text-center text-3xl">Crear Cuenta</h1></strong>
+          <strong>
+            <h1 className="text-center text-3xl">Crear Cuenta</h1>
+          </strong>
           <br />
 
           <div className="w-72">
@@ -154,12 +150,38 @@ const Register = () => {
 
           {errorMessage && (
             <div role="alert" className="alert alert-error">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="stroke-current shrink-0 h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
               <span>{errorMessage}</span>
             </div>
           )}
 
           {userCreatedMessage && (
             <div role="alert" className="alert alert-success">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="stroke-current shrink-0 h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
               <span>{userCreatedMessage}</span>
             </div>
           )}
@@ -172,7 +194,12 @@ const Register = () => {
           </button>
 
           <div className="text-center text-sm">
-            <p>¿Tienes ya una cuenta creada?{" "}<Link to="/login" className="text-black font-semibold">Iniciar Sesión</Link></p>
+            <p>
+              ¿Tienes ya una cuenta creada?{" "}
+              <Link to="/login" className="text-black font-semibold">
+                Iniciar Sesión
+              </Link>
+            </p>
           </div>
         </form>
       </div>

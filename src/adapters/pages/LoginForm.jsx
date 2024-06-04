@@ -78,7 +78,9 @@ const LoginForm = () => {
       <div className="wrapper bg-white p-8 rounded-lg shadow-lg">
         <img className="mx-auto mb-2" src={logo} alt="Logo" />
         <form onSubmit={handleSubmit} className="space-y-4">
-          <strong><h1 className="text-center text-3xl">Login</h1></strong>
+          <strong>
+            <h1 className="text-center text-3xl">Login</h1>
+          </strong>
           <br />
           <div className="w-72">
             <div className="relative h-10 w-full min-w-[415px]">
@@ -130,7 +132,9 @@ const LoginForm = () => {
               />
               Recuérdame
             </label>
-            <Link to="/recuperar" className="text-sm text-black">¿Olvidaste la contraseña?</Link>
+            <Link to="/recuperar" className="text-sm text-black">
+              ¿Olvidaste la contraseña?
+            </Link>
           </div>
 
           {errorMessage && (
@@ -152,12 +156,20 @@ const LoginForm = () => {
             </div>
           )}
 
-          <button type="submit" className="w-full py-2 bg-green-500 text-white rounded focus:outline-none focus:ring focus:ring-pink-400">
+          <button
+            type="submit"
+            className="w-full py-2 bg-green-500 text-white rounded focus:outline-none focus:ring focus:ring-pink-400"
+          >
             Iniciar Sesión
           </button>
 
           <div className="text-center text-sm">
-            <p>¿No tienes una cuenta? <Link to="/register" className="text-black font-semibold">Regístrate</Link></p>
+            <p>
+              ¿No tienes una cuenta?{" "}
+              <Link to="/register" className="text-black font-semibold">
+                Regístrate
+              </Link>
+            </p>
           </div>
         </form>
       </div>
