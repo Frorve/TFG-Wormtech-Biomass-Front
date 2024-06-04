@@ -19,6 +19,10 @@ export default function Home() {
     navigate("/login");
   };
 
+  const handleLogoClick = () => {
+    setView("bascula");
+  };
+
   const { username } = useParams();
   const [dateTime, setDateTime] = useState(new Date());
   const [view, setView] = useState("clientes");
@@ -47,7 +51,7 @@ export default function Home() {
         <div className="mb-10">
           <div className="flex-1">
             <Link to={`/home/${username}`} className="btn btn-ghost max-w-max h-20">
-              <img className="h-auto" src={logo} alt="Logo" />
+              <img className="h-auto" src={logo} alt="Logo" onClick={handleLogoClick} />
             </Link>
           </div>
         </div>

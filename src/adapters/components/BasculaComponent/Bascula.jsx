@@ -15,7 +15,50 @@ export default function Bascula() {
   const [suggestions, setSuggestions] = useState([]);
   const [entradaRegistrada, setEntradaRegistrada] = useState(false);
   const [salidaRegistrada, setSalidaRegistrada] = useState(false);
-  const [id, setId] = useState(null); // Nueva variable de estado para almacenar el ID de la operación de bascula
+  const [id, setId] = useState(null);
+
+  const [registrosPendientes, setRegistrosPendientes] = useState(() => {
+    const storedPendientes = localStorage.getItem("registrosPendientes");
+    return storedPendientes ? JSON.parse(storedPendientes) : [];
+  });
+
+  const updateLocalStorage = () => {
+    const currentData = localStorage.getItem("registrosPendientes");
+    const newData = JSON.stringify(registrosPendientes);
+
+    if (currentData !== newData) {
+      localStorage.setItem("registrosPendientes", newData);
+    }
+  };
+
+  function getCurrentTimeInSpain() {
+    const now = new Date();
+    const offset = 2;
+    now.setHours(now.getHours() + offset);
+    return now.toISOString();
+  }
+
+  useEffect(() => {
+    const fetchRegistrosBascula = async () => {
+      try {
+        const response = await axios.get("http://localhost:8055/items/bascula");
+        const basculaRecords = response.data.data;
+
+        // Filtra los registros pendientes (sin fecha de salida)
+        const pendingRecords = basculaRecords.filter(
+          (record) => !record.fecha_salida
+        );
+        setRegistrosPendientes(pendingRecords);
+      } catch (error) {
+        console.error("Error al obtener los registros de báscula:", error);
+      }
+    };
+
+    fetchRegistrosBascula();
+  }, []);
+
+  useEffect(() => {
+  }, [registrosPendientes]);
 
   useEffect(() => {
     const fetchClientes = async () => {
@@ -31,7 +74,6 @@ export default function Bascula() {
   }, []);
 
   useEffect(() => {
-    // Calcula el pesaje total
     const inicial = parseFloat(bascuPesajeInicial);
     const final = parseFloat(bascuPesajeFinal);
     if (!isNaN(inicial) && !isNaN(final)) {
@@ -66,6 +108,7 @@ export default function Bascula() {
     setBascuResiduo("");
     setEntradaRegistrada(false);
     setSalidaRegistrada(false);
+    setId(null);
   };
 
   const handleSuggestionClick = (suggestion) => {
@@ -75,14 +118,6 @@ export default function Bascula() {
 
   const handleMatriculaChange = (event) => {
     setBascuMatricula(event.target.value);
-  };
-
-  const handleFechaEntradaChange = (event) => {
-    setBascuFechaEntrada(event.target.value);
-  };
-
-  const handleFechaSalidaChange = (event) => {
-    setBascuFechaSalida(event.target.value);
   };
 
   const handlePesajeInicialChange = (event) => {
@@ -106,21 +141,30 @@ export default function Bascula() {
   };
 
   const handleRegistroEntrada = async () => {
+    const fechaActual = getCurrentTimeInSpain();
     try {
       const basculaInfo = {
         matricula: bascuMatricula,
         cliente: bascuCliente,
-        fecha_entrada: bascuFechaEntrada,
+        fecha_entrada: fechaActual,
         pesaje_inicial: bascuPesajeInicial,
         parking: bascuParking,
         residuo: bascuResiduo,
       };
 
-      const response = await axios.post("http://localhost:8055/items/bascula", basculaInfo);
+      const response = await axios.post(
+        "http://localhost:8055/items/bascula",
+        basculaInfo
+      );
       if (response.status === 200) {
         setEntradaRegistrada(true);
-        setId(response.data.data.id); // Almacena el ID de la operación de bascula
-        console.log(response.data.data.id);
+        setId(response.data.data.id);
+        const updatedPendingRecords = registrosPendientes.filter(
+          (record) => record.id !== id
+        );
+        setRegistrosPendientes(updatedPendingRecords);
+        updateLocalStorage();
+        handleReset();
         console.log("Entrada registrada con éxito.");
       }
     } catch (error) {
@@ -129,23 +173,45 @@ export default function Bascula() {
   };
 
   const handleRegistroSalida = async () => {
+    const fechaActual = getCurrentTimeInSpain();
     try {
       const basculaInfo = {
         matricula: bascuMatricula,
         cliente: bascuCliente,
-        fecha_salida: bascuFechaSalida,
+        fecha_salida: fechaActual,
         pesaje_final: bascuPesajeFinal,
         pesaje_total: bascuPesajeTotal,
       };
 
-      const response = await axios.patch(`http://localhost:8055/items/bascula/${id}`, basculaInfo);
+      const response = await axios.patch(
+        `http://localhost:8055/items/bascula/${id}`,
+        basculaInfo
+      );
       if (response.status === 200) {
         setSalidaRegistrada(true);
+        setRegistrosPendientes(
+          registrosPendientes.filter((registro) => registro.id !== id)
+        );
+        const updatedPendingRecords = registrosPendientes.filter(
+          (record) => record.id !== id
+        );
+        setRegistrosPendientes(updatedPendingRecords);
+        handleReset();
         console.log("Salida registrada con éxito.");
       }
     } catch (error) {
       console.error("Error al registrar la salida:", error);
     }
+  };
+  const handleRegistroPendienteClick = (registro) => {
+    setBascuCliente(registro.cliente);
+    setBascuMatricula(registro.matricula);
+    setBascuFechaEntrada(registro.fecha_entrada);
+    setBascuPesajeInicial(registro.pesaje_inicial);
+    setBascuParking(registro.parking);
+    setBascuResiduo(registro.residuo);
+    setId(registro.id);
+    setEntradaRegistrada(true);
   };
 
   return (
@@ -186,27 +252,6 @@ export default function Bascula() {
             )}
           </div>
           <div className="flex flex-col">
-            <label>Fecha de entrada:</label>
-            <input
-              type="datetime-local"
-              value={bascuFechaEntrada}
-              onChange={handleFechaEntradaChange}
-              className="mb-2 p-2 border rounded"
-              required
-            />
-          </div>
-          <div className="flex flex-col">
-            <label>Fecha de salida:</label>
-            <input
-              type="datetime-local"
-              value={bascuFechaSalida}
-              onChange={handleFechaSalidaChange}
-              className="mb-2 p-2 border rounded"
-              required
-              disabled={!entradaRegistrada || salidaRegistrada} // Deshabilitar si no se ha registrado la entrada o ya se registró la salida
-            />
-          </div>
-          <div className="flex flex-col">
             <label>Pesaje inicial:</label>
             <input
               type="number"
@@ -224,7 +269,7 @@ export default function Bascula() {
               onChange={handlePesajeFinalChange}
               className="mb-2 p-2 border rounded"
               required
-              disabled={!entradaRegistrada || salidaRegistrada} // Deshabilitar si no se ha registrado la entrada o ya se registró la salida
+              disabled={!entradaRegistrada || salidaRegistrada}
             />
           </div>
           <div className="flex flex-col">
@@ -259,11 +304,17 @@ export default function Bascula() {
               className="mb-2 p-2 border rounded"
               required
             >
-              <option value="RResiduo 1 - Restos vegetales">Residuo 1 - Restos vegetales</option>
-              <option value="Residuo 2 - Material de construcción">Residuo 2 - Material de construcción</option>
+              <option value="Residuo 1 - Restos vegetales">
+                Residuo 1 - Restos vegetales
+              </option>
+              <option value="Residuo 2 - Material de construcción">
+                Residuo 2 - Material de construcción
+              </option>
               <option value="Residuo 3 - Plástico">Residuo 3 - Plástico</option>
               <option value="Residuo 4 - Tierra">Residuo 4 - Tierra</option>
-              <option value="Residuo 5 - Mezcla de residuos">Residuo 5 - Mezcla de residuos</option>
+              <option value="Residuo 5 - Mezcla de residuos">
+                Residuo 5 - Mezcla de residuos
+              </option>
               <option value="Compost">Compost</option>
             </select>
           </div>
@@ -277,7 +328,7 @@ export default function Bascula() {
             <button
               onClick={handleRegistroSalida}
               className="bg-green-900 text-white rounded py-2 px-4"
-              disabled={!entradaRegistrada || salidaRegistrada} // Deshabilitar si no se ha registrado la entrada o ya se registró la salida
+              disabled={!entradaRegistrada || salidaRegistrada}
             >
               Registrar Salida
             </button>
@@ -288,6 +339,33 @@ export default function Bascula() {
               Resetear
             </button>
           </div>
+        </div>
+        <div className="mt-6">
+          <h2 className="bg-green-600 text-white rounded py-2 px-4 text-center">
+            <strong>Registros Pendientes</strong>
+          </h2>
+          <ul className="mt-2">
+            {registrosPendientes.map((registro) => (
+              <li
+                key={registro.id}
+                onClick={() => handleRegistroPendienteClick(registro)}
+                className="cursor-pointer bg-green-300 mb-2 py-4 px-6 rounded-lg flex items-center justify-between"
+              >
+                <span style={{ fontSize: "12px", fontWeight: "normal" }}>
+                  Matrícula:
+                </span>
+                <strong>{registro.matricula}</strong>
+                <span style={{ fontSize: "12px", fontWeight: "normal" }}>
+                  Cliente:
+                </span>
+                <strong>{registro.cliente}</strong>
+                <span style={{ fontSize: "12px", fontWeight: "normal" }}>
+                  Fecha de entrada:
+                </span>
+                <strong>{registro.fecha_entrada}</strong>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </div>

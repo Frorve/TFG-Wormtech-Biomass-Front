@@ -154,6 +154,10 @@ export default function Registro() {
                   <small>Residuo</small>
                   <div>{selectedRegistro.residuo}</div>
                 </div>
+                <div>
+                  <small>Parking</small>
+                  <div>{selectedRegistro.parking}</div>
+                </div>
               </div>
               <div className="modal-action">
                 <form method="dialog">
