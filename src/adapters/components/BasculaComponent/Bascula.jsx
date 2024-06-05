@@ -143,7 +143,22 @@ export default function Bascula() {
     setBascuResiduo(event.target.value);
   };
 
+  const validateForm = () => {
+    if (bascuResiduo === "") {
+      setErrorMessage("Por favor, seleccione una opción válida para residuo.");
+      setTimeout(() => setErrorMessage(""), 3000);
+      return false;
+    }
+    if (bascuResiduo !== "Compost" && bascuParking === "") {
+      setErrorMessage("Por favor, seleccione una opción válida para parking.");
+      setTimeout(() => setErrorMessage(""), 3000);
+      return false;
+    }
+    return true;
+  };
+
   const handleRegistroEntrada = async () => {
+    if (!validateForm()) return;
     const fechaActual = getCurrentTimeInSpain();
     try {
       const basculaInfo = {
@@ -181,6 +196,7 @@ export default function Bascula() {
   };
 
   const handleRegistroSalida = async () => {
+    if (!validateForm()) return;
     const fechaActual = getCurrentTimeInSpain();
     try {
       const basculaInfo = {
@@ -189,6 +205,8 @@ export default function Bascula() {
         fecha_salida: fechaActual,
         pesaje_final: bascuPesajeFinal,
         pesaje_total: bascuPesajeTotal,
+        parking: bascuParking,
+        residuo: bascuResiduo,
       };
 
       const response = await axios.patch(
@@ -224,8 +242,8 @@ export default function Bascula() {
     setBascuPesajeInicial(registro.pesaje_inicial);
     setBascuParking(registro.parking);
     setBascuResiduo(registro.residuo);
-    setId(registro.id);
     setEntradaRegistrada(true);
+    setId(registro.id);
   };
 
   return (
@@ -304,6 +322,7 @@ export default function Bascula() {
                 className="mb-2 p-2 border rounded"
                 required
               >
+                <option value="">Seleccionar...</option>
                 <option value="Parking 1">Parking 1</option>
                 <option value="Parking 2">Parking 2</option>
                 <option value="Parking 3">Parking 3</option>
@@ -318,16 +337,19 @@ export default function Bascula() {
               className="mb-2 p-2 border rounded"
               required
             >
-              <option value="Residuo 1 - Restos vegetales">
-                Residuo 1 - Restos vegetales
+              <option value="">Seleccionar...</option>
+              <option value="20 02 01 Residuos biodegradables">
+                20 02 01 Residuos biodegradables
               </option>
-              <option value="Residuo 2 - Material de construcción">
-                Residuo 2 - Material de construcción
+              <option value="17 01 02 Material de construcción">
+                17 01 02 Material de construcción
               </option>
-              <option value="Residuo 3 - Plástico">Residuo 3 - Plástico</option>
-              <option value="Residuo 4 - Tierra">Residuo 4 - Tierra</option>
-              <option value="Residuo 5 - Mezcla de residuos">
-                Residuo 5 - Mezcla de residuos
+              <option value="20 01 39 Plástico">20 01 39 Plástico</option>
+              <option value="20 02 02 Tierra y piedras">
+                20 02 02 Tierra y piedras
+              </option>
+              <option value="20 03 01 Mezcla de residuos">
+                20 03 01 Mezcla de residuos
               </option>
               <option value="Compost">Compost</option>
             </select>
@@ -359,14 +381,14 @@ export default function Bascula() {
           <div role="alert" className="alert alert-success mt-5">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="stroke-current shrink-0 h-6 w-6"
+              className="stroke-current shrink-0 h-6 w-6"
               fill="none"
               viewBox="0 0 24 24"
             >
               <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
@@ -378,14 +400,14 @@ export default function Bascula() {
           <div role="alert" className="alert alert-error mt-5">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="stroke-current shrink-0 h-6 w-6"
+              className="stroke-current shrink-0 h-6 w-6"
               fill="none"
               viewBox="0 0 24 24"
             >
               <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
                 d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
@@ -398,16 +420,20 @@ export default function Bascula() {
             <strong>Registros Pendientes</strong>
           </h2>
           <ul className="mt-2">
-            {registrosPendientes.map((registro) => (
+            {registrosPendientes.map((registro, index) => (
               <li
                 key={registro.id}
                 onClick={() => handleRegistroPendienteClick(registro)}
                 className="cursor-pointer bg-green-300 mb-2 py-4 px-6 rounded-lg flex items-center justify-between"
               >
                 <div className="flex-1 min-w-[100px] mr-2">
+                  <span className="text-xs font-normal">N°:</span>
+                  <strong className="block truncate">{index + 1}</strong>
+                </div>
+                <div className="flex-1 min-w-[100px] mr-2">
                   <span className="text-xs font-normal">Matrícula:</span>
                   <strong className="block truncate">
-                    {registro.matricula}
+                    {registro.matricula}{" "}
                   </strong>
                 </div>
                 <div className="flex-1 min-w-[100px] mr-2">
@@ -417,7 +443,7 @@ export default function Bascula() {
                 <div className="flex-1 min-w-[100px] mr-2">
                   <span className="text-xs font-normal">Fecha de entrada:</span>
                   <strong className="block truncate">
-                    {registro.fecha_entrada}
+                    {registro.fecha_entrada}{" "}
                   </strong>
                 </div>
               </li>

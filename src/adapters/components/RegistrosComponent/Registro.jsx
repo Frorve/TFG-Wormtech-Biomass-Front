@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import moment from "moment";
 import "moment/locale/es";
+import Invoice from "./Invoice";
+import { PDFDownloadLink, BlobProvider } from "@react-pdf/renderer";
 
 moment.locale("es");
 
@@ -10,14 +12,19 @@ export default function Registro() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("cliente");
   const [selectedRegistro, setSelectedRegistro] = useState(null);
+  const [showPDF, setShowPDF] = useState(null);
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
 
   useEffect(() => {
     fetchRegistros();
-  }, []);
+  }, [page]);
 
   const fetchRegistros = async () => {
     try {
-      const response = await axios.get("http://localhost:8055/items/bascula");
+      const response = await axios.get(
+        `http://localhost:8055/items/bascula?page=${page}&pageSize=${pageSize}`
+      );
       const sortedRegistros = response.data.data.sort(
         (a, b) => new Date(b.fecha_entrada) - new Date(a.fecha_entrada)
       );
@@ -40,6 +47,77 @@ export default function Registro() {
     document.getElementById("my_modal_4").showModal();
   };
 
+  const uploadPDF = async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8055/files",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      return response.data.data.id; // Devuelve el ID del archivo subido
+    } catch (error) {
+      console.error("Error al subir el archivo PDF:", error);
+      throw error;
+    }
+  };
+
+  const handleGenerateFactura = async (registro) => {
+    setShowPDF(registro);
+
+    // Usar BlobProvider para obtener el blob del PDF
+    const { url } = await new Promise((resolve, reject) => {
+      <BlobProvider document={<Invoice registro={registro} />}>
+        {({ blob, url, loading, error }) => {
+          if (loading) return;
+          if (error) reject(error);
+          resolve({ blob, url });
+        }}
+      </BlobProvider>;
+    });
+
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const file = new File(
+      [blob],
+      `Factura_${registro.cliente}_${moment(registro.fecha_entrada).format(
+        "YYYYMMDD"
+      )}.pdf`,
+      { type: "application/pdf" }
+    );
+
+    // Subir el archivo PDF a Directus y obtener el ID del archivo
+    const fileId = await uploadPDF(file);
+
+    // Guardar la factura en Directus
+    await saveFactura(registro, fileId);
+  };
+
+  const saveFactura = async (registro, fileId) => {
+    try {
+      const facturaData = {
+        estado: "No pagada", // Puedes ajustar esto según tu lógica
+        factura: fileId, // Guardar el ID del archivo PDF generado
+        empresa: registro.cliente,
+        fecha: new Date().toISOString(),
+      };
+
+      const response = await axios.post(
+        "http://localhost:8055/items/factura",
+        facturaData
+      );
+      console.log("Factura guardada:", response.data);
+    } catch (error) {
+      console.error("Error al guardar la factura:", error);
+    }
+  };
+
   const filteredRegistros = registros.filter((registro) => {
     if (!registro.pesaje_total) {
       return false;
@@ -51,6 +129,8 @@ export default function Registro() {
         .format("MMMM")
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
+    } else if (filterType === "residuo") {
+      return registro.residuo.toLowerCase().includes(searchTerm.toLowerCase());
     }
     return true;
   });
@@ -74,6 +154,7 @@ export default function Registro() {
         >
           <option value="cliente">Filtrar por Cliente</option>
           <option value="mes">Filtrar por Mes</option>
+          <option value="residuo">Filtrar por Residuo</option>
         </select>
         <input
           type="text"
@@ -104,7 +185,9 @@ export default function Registro() {
                 </div>
                 <div className="flex-1 min-w-[150px] mr-2">
                   <small>Pesaje Total</small>
-                  <div className="font-bold truncate">{registro.pesaje_total}</div>
+                  <div className="font-bold truncate">
+                    {registro.pesaje_total}
+                  </div>
                 </div>
                 <div className="flex-none">
                   <button
@@ -113,12 +196,24 @@ export default function Registro() {
                   >
                     Ver más
                   </button>
-                  <button
-                    className="bg-green-900 text-white py-1 px-2 rounded-lg mr-2 mt-1.5"
-                    onClick={() => handleViewMore(registro)}
-                  >
-                    Generar factura
-                  </button>
+                  {showPDF === registro ? (
+                    <PDFDownloadLink
+                      document={<Invoice registro={registro} />}
+                      fileName={`Factura_${registro.cliente}_${moment(
+                        registro.fecha_entrada
+                      ).format("YYYYMMDD")}.pdf`}
+                      className="bg-green-900 text-white py-1 px-2 rounded-lg mr-2 mt-1.5"
+                    >
+                      Descargar factura
+                    </PDFDownloadLink>
+                  ) : (
+                    <button
+                      className="bg-green-900 text-white py-1 px-2 rounded-lg mr-2 mt-1.5"
+                      onClick={() => handleGenerateFactura(registro)}
+                    >
+                      Generar factura
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
@@ -178,6 +273,10 @@ export default function Registro() {
           )}
         </div>
       </dialog>
+
+      {filteredRegistros.length > page * pageSize && (
+        <button onClick={() => setPage(page + 1)}>Cargar más...</button>
+      )}
     </div>
   );
 }
