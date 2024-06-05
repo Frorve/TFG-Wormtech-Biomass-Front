@@ -355,19 +355,22 @@ export default function Bascula() {
             </select>
           </div>
           <div className="flex items-end space-x-5 col-span-3">
-            <button
-              onClick={handleRegistroEntrada}
-              className="bg-green-500 text-white rounded py-2 px-4"
-            >
-              Registrar Entrada
-            </button>
-            <button
-              onClick={handleRegistroSalida}
-              className="bg-green-900 text-white rounded py-2 px-4"
-              disabled={!entradaRegistrada || salidaRegistrada}
-            >
-              Registrar Salida
-            </button>
+            {!entradaRegistrada && !salidaRegistrada && (
+              <button
+                onClick={handleRegistroEntrada}
+                className="bg-green-500 text-white rounded py-2 px-4"
+              >
+                Registrar Entrada
+              </button>
+            )}
+            {entradaRegistrada && !salidaRegistrada && (
+              <button
+                onClick={handleRegistroSalida}
+                className="bg-green-900 text-white rounded py-2 px-4"
+              >
+                Registrar Salida
+              </button>
+            )}
             <button
               onClick={handleReset}
               className="bg-red-500 text-white rounded py-2 px-4"
