@@ -3,7 +3,8 @@ import axios from "axios";
 import moment from "moment";
 import "moment/locale/es";
 import Invoice from "./Invoice";
-import { PDFDownloadLink, BlobProvider } from "@react-pdf/renderer";
+import { PDFDownloadLink, BlobProvider, pdf } from "@react-pdf/renderer";
+import MonthlyInvoice from "./MonthlyInvoice";
 
 moment.locale("es");
 
@@ -15,9 +16,7 @@ export default function Registro() {
   const [showPDF, setShowPDF] = useState(null);
   const [page, setPage] = useState(1);
   const pageSize = 10;
-  const [facturado, setFacturado] = useState({
-    estado: "Facturado",
-  })
+  const [filterMonth, setFilterMonth] = useState("");
 
   useEffect(() => {
     fetchRegistros();
@@ -41,6 +40,13 @@ export default function Registro() {
 
   const handleFilterTypeChange = (event) => {
     setFilterType(event.target.value);
+    if (event.target.value !== "cliente") {
+      setFilterMonth("");
+    }
+  };
+
+  const handleFilterMonthChange = (event) => {
+    setFilterMonth(event.target.value);
   };
 
   const handleViewMore = (registro) => {
@@ -76,7 +82,7 @@ export default function Registro() {
         `http://localhost:8055/items/bascula/${registro.id}`,
         { estado: "Facturado" }
       );
-  
+
       setTimeout(() => {
         setRegistros((prevRegistros) =>
           prevRegistros.map((reg) =>
@@ -84,20 +90,16 @@ export default function Registro() {
           )
         );
       }, 5000);
-  
     } catch (error) {
       console.error("Error al actualizar el estado del registro:", error);
     }
   };
-  
 
   const handleGenerateFactura = async (registro) => {
     console.log("Generando factura para:", registro);
     setShowPDF(registro);
 
     await updateRegistroEstado(registro);
-
-//Si hago mas codigo despues del try del Blob no funcionan, no se porque
 
     try {
       // Usar BlobProvider para obtener el blob del PDF
@@ -134,7 +136,6 @@ export default function Registro() {
       // Actualizar el estado del registro en la base de datos
       await updateRegistroEstado(registro);
 
-
       console.log("Factura generada y estado actualizado");
     } catch (error) {
       console.error("Error al generar la factura:", error);
@@ -165,7 +166,9 @@ export default function Registro() {
       return false;
     }
     if (filterType === "cliente") {
-      return registro.cliente.toLowerCase().includes(searchTerm.toLowerCase());
+      const clienteMatch = registro.cliente.toLowerCase().includes(searchTerm.toLowerCase());
+      const monthMatch = filterMonth ? moment(registro.fecha_entrada).format("YYYY-MM") === filterMonth : true;
+      return clienteMatch && monthMatch;
     } else if (filterType === "mes") {
       return moment(registro.fecha_entrada)
         .format("MMMM")
@@ -176,6 +179,19 @@ export default function Registro() {
     }
     return true;
   });
+
+  const filteredSearchRegistros = registros.filter((registro) => {
+    if (!registro.pesaje_total) {
+      return false;
+    }
+    if (filterType === "cliente") {
+      const clienteMatch = registro.cliente.toLowerCase().includes(searchTerm.toLowerCase());
+      const monthMatch = moment(registro.fecha_entrada).format("YYYY-MM") === filterMonth;
+      return clienteMatch && monthMatch;
+    }
+    return true;
+  });
+  
 
   // Paginación de registros filtrados
   const paginatedRegistros = filteredRegistros.slice(
@@ -192,6 +208,37 @@ export default function Registro() {
     return acc;
   }, {});
 
+  const handleGenerateMonthlyFactura = async (cliente, month) => {
+    const registrosCliente = registros.filter(
+      (registro) => registro.cliente === cliente && moment(registro.fecha_entrada).format("YYYY-MM") === month
+    );
+
+    if (registrosCliente.length === 0) {
+      console.warn("No hay registros para este cliente en el mes seleccionado.");
+      return;
+    }
+
+    setShowPDF({ cliente, month, registros: registrosCliente });
+
+    try {
+      const { url } = await new Promise((resolve, reject) => {
+        const blob = pdf(
+          <MonthlyInvoice registros={registrosCliente} cliente={cliente} month={month} />
+        ).toBlob();
+
+        const url = URL.createObjectURL(blob);
+        resolve({ url });
+      });
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `Factura_Mensual_${cliente}_${month}.pdf`;
+      link.click();
+    } catch (error) {
+      console.error("Error al generar la factura mensual:", error);
+    }
+  };
+
   const totalPages = Math.ceil(filteredRegistros.length / pageSize);
 
   return (
@@ -205,7 +252,7 @@ export default function Registro() {
           <option value="cliente">Filtrar por Cliente</option>
           <option value="mes">Filtrar por Mes</option>
           <option value="residuo">Filtrar por Residuo</option>
-        </select>
+          </select>
         <input
           type="text"
           placeholder="Buscar ..."
@@ -213,6 +260,23 @@ export default function Registro() {
           value={searchTerm}
           onChange={handleSearch}
         />
+        {filterType === "cliente" && (
+          <input
+            type="month"
+            placeholder="Mes"
+            className="py-2 px-4 rounded-lg border-2 border-black ml-4"
+            value={filterMonth}
+            onChange={handleFilterMonthChange}
+          />
+        )}
+        {filterType === "cliente" && (
+          <button
+            onClick={() => handleGenerateMonthlyFactura(searchTerm, filterMonth)}
+            className="py-2 px-4 bg-green-900 text-white rounded-lg ml-4"
+          >
+            Generar Factura Mensual
+          </button>
+        )}
       </div>
       <div className="flex flex-col">
         {Object.keys(groupedRegistros).map((date) => (
