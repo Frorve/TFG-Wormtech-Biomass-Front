@@ -23,7 +23,6 @@ export default function Clientes() {
   const fetchEmpresas = async () => {
     try {
       const response = await axios.get("http://localhost:8055/items/empresa");
-      console.log("Response data:", response.data);
       setEmpresas(response.data.data);
     } catch (error) {
       console.error("Error fetching empresas:", error);

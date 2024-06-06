@@ -15,16 +15,17 @@ export default function Registro() {
   const [showPDF, setShowPDF] = useState(null);
   const [page, setPage] = useState(1);
   const pageSize = 10;
+  const [facturado, setFacturado] = useState({
+    estado: "Facturado",
+  })
 
   useEffect(() => {
     fetchRegistros();
-  }, [page]);
+  }, []);
 
   const fetchRegistros = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:8055/items/bascula?page=${page}&pageSize=${pageSize}`
-      );
+      const response = await axios.get(`http://localhost:8055/items/bascula`);
       const sortedRegistros = response.data.data.sort(
         (a, b) => new Date(b.fecha_entrada) - new Date(a.fecha_entrada)
       );
@@ -68,35 +69,76 @@ export default function Registro() {
     }
   };
 
+  const updateRegistroEstado = async (registro) => {
+    try {
+      console.log("Actualizando estado del registro:", registro);
+      const response = await axios.patch(
+        `http://localhost:8055/items/bascula/${registro.id}`,
+        { estado: "Facturado" }
+      );
+  
+      setTimeout(() => {
+        setRegistros((prevRegistros) =>
+          prevRegistros.map((reg) =>
+            reg.id === registro.id ? { ...reg, estado: "Facturado" } : reg
+          )
+        );
+      }, 5000);
+  
+    } catch (error) {
+      console.error("Error al actualizar el estado del registro:", error);
+    }
+  };
+  
+
   const handleGenerateFactura = async (registro) => {
+    console.log("Generando factura para:", registro);
     setShowPDF(registro);
 
-    // Usar BlobProvider para obtener el blob del PDF
-    const { url } = await new Promise((resolve, reject) => {
-      <BlobProvider document={<Invoice registro={registro} />}>
-        {({ blob, url, loading, error }) => {
-          if (loading) return;
-          if (error) reject(error);
-          resolve({ blob, url });
-        }}
-      </BlobProvider>;
-    });
+    await updateRegistroEstado(registro);
 
-    const response = await fetch(url);
-    const blob = await response.blob();
-    const file = new File(
-      [blob],
-      `Factura_${registro.cliente}_${moment(registro.fecha_entrada).format(
-        "YYYYMMDD"
-      )}.pdf`,
-      { type: "application/pdf" }
-    );
+//Si hago mas codigo despues del try del Blob no funcionan, no se porque
 
-    // Subir el archivo PDF a Directus y obtener el ID del archivo
-    const fileId = await uploadPDF(file);
+    try {
+      // Usar BlobProvider para obtener el blob del PDF
+      const { url } = await new Promise((resolve, reject) => {
+        <BlobProvider document={<Invoice registro={registro} />}>
+          {({ blob, url, loading, error }) => {
+            if (loading) return;
+            if (error) reject(error);
+            resolve({ blob, url });
+          }}
+        </BlobProvider>;
+      });
 
-    // Guardar la factura en Directus
-    await saveFactura(registro, fileId);
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const file = new File(
+        [blob],
+        `Factura_${registro.cliente}_${moment(registro.fecha_entrada).format(
+          "YYYYMMDD"
+        )}.pdf`,
+        { type: "application/pdf" }
+      );
+
+      console.log("PDF generado y preparado para subir:", file);
+
+      // Subir el archivo PDF a Directus y obtener el ID del archivo
+      const fileId = await uploadPDF(file);
+
+      console.log("ID del archivo subido:", fileId);
+
+      // Guardar la factura en Directus
+      await saveFactura(registro, fileId);
+
+      // Actualizar el estado del registro en la base de datos
+      await updateRegistroEstado(registro);
+
+
+      console.log("Factura generada y estado actualizado");
+    } catch (error) {
+      console.error("Error al generar la factura:", error);
+    }
   };
 
   const saveFactura = async (registro, fileId) => {
@@ -135,7 +177,13 @@ export default function Registro() {
     return true;
   });
 
-  const groupedRegistros = filteredRegistros.reduce((acc, registro) => {
+  // Paginación de registros filtrados
+  const paginatedRegistros = filteredRegistros.slice(
+    (page - 1) * pageSize,
+    page * pageSize
+  );
+
+  const groupedRegistros = paginatedRegistros.reduce((acc, registro) => {
     const date = moment(registro.fecha_entrada).format("YYYY-MM-DD");
     if (!acc[date]) {
       acc[date] = [];
@@ -143,6 +191,8 @@ export default function Registro() {
     acc[date].push(registro);
     return acc;
   }, {});
+
+  const totalPages = Math.ceil(filteredRegistros.length / pageSize);
 
   return (
     <div className="flex-1 p-5">
@@ -189,6 +239,10 @@ export default function Registro() {
                     {registro.pesaje_total}
                   </div>
                 </div>
+                <div className="flex-1 min-w-[150px] mr-2">
+                  <small>Estado</small>
+                  <div className="font-bold truncate">{registro.estado}</div>
+                </div>
                 <div className="flex-none">
                   <button
                     className="bg-green-500 text-white py-1 px-2 rounded-lg mr-2 mt-1.5"
@@ -202,16 +256,16 @@ export default function Registro() {
                       fileName={`Factura_${registro.cliente}_${moment(
                         registro.fecha_entrada
                       ).format("YYYYMMDD")}.pdf`}
-                      className="bg-green-900 text-white py-1 px-2 rounded-lg mr-2 mt-1.5"
+                      className="bg-green-900 text-white py-1 px-2 rounded-lg"
                     >
-                      Descargar factura
+                      Descargar PDF
                     </PDFDownloadLink>
                   ) : (
                     <button
-                      className="bg-green-900 text-white py-1 px-2 rounded-lg mr-2 mt-1.5"
+                      className="bg-green-900 text-white py-1 px-2 rounded-lg"
                       onClick={() => handleGenerateFactura(registro)}
                     >
-                      Generar factura
+                      Generar Factura
                     </button>
                   )}
                 </div>
@@ -219,8 +273,26 @@ export default function Registro() {
             ))}
           </div>
         ))}
+        <div className="flex justify-between mt-4">
+          <button
+            className="bg-green-700 text-white py-1 px-2 rounded-lg ml-20"
+            disabled={page === 1}
+            onClick={() => setPage(page - 1)}
+          >
+            Anterior
+          </button>
+          <div>
+            Página {page} de {totalPages}
+          </div>
+          <button
+            className="bg-green-700 text-white py-1 px-2 rounded-lg mr-20"
+            disabled={page === totalPages}
+            onClick={() => setPage(page + 1)}
+          >
+            Siguiente
+          </button>
+        </div>
       </div>
-
       <dialog id="my_modal_4" className="modal">
         <div className="modal-box w-11/12 max-w-5xl">
           {selectedRegistro && (
@@ -263,6 +335,10 @@ export default function Registro() {
                   <small>Parking</small>
                   <div>{selectedRegistro.parking}</div>
                 </div>
+                <div>
+                  <small>Estado</small>
+                  <div>{selectedRegistro.estado}</div>
+                </div>
               </div>
               <div className="modal-action">
                 <form method="dialog">
@@ -273,10 +349,6 @@ export default function Registro() {
           )}
         </div>
       </dialog>
-
-      {filteredRegistros.length > page * pageSize && (
-        <button onClick={() => setPage(page + 1)}>Cargar más...</button>
-      )}
     </div>
   );
 }
