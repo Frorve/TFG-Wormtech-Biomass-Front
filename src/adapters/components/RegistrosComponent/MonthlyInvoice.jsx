@@ -1,5 +1,13 @@
 import React from "react";
-import { Page, Text, View, Document, StyleSheet, Image, Font } from "@react-pdf/renderer";
+import {
+  Page,
+  Text,
+  View,
+  Document,
+  StyleSheet,
+  Image,
+  Font,
+} from "@react-pdf/renderer";
 import moment from "moment";
 import logo from "../../../assets/logo.png";
 import regular from "../../../fonts/Poppins-Regular.ttf";
@@ -7,91 +15,88 @@ import bold from "../../../fonts/Poppins-Bold.ttf";
 
 Font.register({
   family: "Poppins",
-  fonts: [
-    { src: regular },
-    { src: bold, fontWeight: "bold" },
-  ],
+  fonts: [{ src: regular }, { src: bold, fontWeight: "bold" }],
 });
 
 const styles = StyleSheet.create({
-    page: {
-        padding: 30,
-      },
-      header: {
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "space-between",
-        marginBottom: 20,
-      },
-      datosEmpresa: {
-        textAlign: "left",
-        fontSize: 12,
-      },
-      datosCliente: {
-        textAlign: "right",
-        fontSize: 12,
-      },
-      facturaNumero: {
-        fontFamily: "Poppins",
-        fontSize: 12,
-        marginBottom: 10,
-      },
-      table: {
-        display: "table",
-        width: "auto",
-        margin: "10px 0",
-      },
-      tableRow: {
-        flexDirection: "row",
-      },
-      tableCol: {
-        width: "25%",
-        borderStyle: "solid",
-        borderWidth: 1,
-        borderColor: "#000",
-      },
-      tableCell: {
-        margin: "auto",
-        marginTop: 5,
-        fontSize: 10,
-      },
-      summaryTable: {
-        marginTop: 20,
-        display: "table",
-        width: "auto",
-      },
-      summaryTableRow: {
-        flexDirection: "row",
-      },
-      summaryTableCol: {
-        width: "50%",
-        borderStyle: "solid",
-        borderWidth: 1,
-        borderColor: "#000",
-      },
-      summaryTableCell: {
-        margin: "auto",
-        marginTop: 5,
-        fontSize: 10,
-      },
-      totalCell: {
-        fontWeight: "bold",
-      },
-      logo: {
-        width: 150,
-        height: 50,
-        marginBottom: 5,
-      },
-      pago: {
-        fontSize: 12,
-        marginTop: 20,
-        marginBottom: 10,
-      },
-      cuenta: {
-        fontSize: 12,
-        textAlign: "center",
-        fontWeight: "bold",
-      },
+  page: {
+    padding: 30,
+  },
+  header: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
+  datosEmpresa: {
+    textAlign: "left",
+    fontSize: 12,
+  },
+  datosCliente: {
+    textAlign: "right",
+    fontSize: 12,
+  },
+  facturaNumero: {
+    fontFamily: "Poppins",
+    fontSize: 12,
+    marginBottom: 10,
+  },
+  table: {
+    display: "table",
+    width: "auto",
+    margin: "10px 0",
+  },
+  tableRow: {
+    flexDirection: "row",
+  },
+  tableCol: {
+    width: "25%",
+    borderStyle: "solid",
+    borderWidth: 1,
+    borderColor: "#000",
+  },
+  tableCell: {
+    margin: "auto",
+    marginTop: 5,
+    fontSize: 10,
+  },
+  summaryTable: {
+    marginTop: 20,
+    display: "table",
+    width: "auto",
+  },
+  summaryTableRow: {
+    flexDirection: "row",
+  },
+  summaryTableCol: {
+    width: "50%",
+    borderStyle: "solid",
+    borderWidth: 1,
+    borderColor: "#000",
+  },
+  summaryTableCell: {
+    margin: "auto",
+    marginTop: 5,
+    fontSize: 10,
+  },
+  totalCell: {
+    fontWeight: "bold",
+  },
+  logo: {
+    width: 150,
+    height: 50,
+    marginBottom: 5,
+  },
+  pago: {
+    fontSize: 12,
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  cuenta: {
+    fontSize: 12,
+    textAlign: "center",
+    fontWeight: "bold",
+  },
 });
 
 const getPricePerTon = (residuo) => {
@@ -107,10 +112,9 @@ const getPricePerTon = (residuo) => {
 };
 
 const generateInvoiceNumber = () => {
-    // Generate a random invoice number or implement your logic to generate it
-    return Math.floor(Math.random() * 1000000).toString(); // Example: generates a random 6-digit number
-  };
-  
+  // Generate a random invoice number or implement your logic to generate it
+  return Math.floor(Math.random() * 1000000).toString(); // Example: generates a random 6-digit number
+};
 
 const MonthlyInvoice = ({ registros, cliente, month }) => {
   const invoiceNumber = generateInvoiceNumber();
@@ -119,9 +123,12 @@ const MonthlyInvoice = ({ registros, cliente, month }) => {
     (registro) => registro.cliente === cliente
   );
 
-  const totalPesaje = registrosCliente.reduce((acc, registro) => acc + registro.pesaje_total, 0);
+  const totalPesaje = registrosCliente.reduce(
+    (acc, registro) => acc + registro.pesaje_total,
+    0
+  );
 
-  const totalPrices = registrosCliente.map(registro => {
+  const totalPrices = registrosCliente.map((registro) => {
     const pricePerTon = getPricePerTon(registro.residuo);
     return registro.pesaje_total * pricePerTon;
   });
@@ -177,11 +184,16 @@ const MonthlyInvoice = ({ registros, cliente, month }) => {
                 <Text style={styles.tableCell}>{registro.pesaje_total} Kg</Text>
               </View>
               <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>{getPricePerTon(registro.residuo)} €/Kg</Text>
+                <Text style={styles.tableCell}>
+                  {getPricePerTon(registro.residuo)} €/Kg
+                </Text>
               </View>
               <View style={styles.tableCol}>
                 <Text style={styles.tableCell}>
-                  {(registro.pesaje_total * getPricePerTon(registro.residuo)).toFixed(2)} €
+                  {(
+                    registro.pesaje_total * getPricePerTon(registro.residuo)
+                  ).toFixed(2)}{" "}
+                  €
                 </Text>
               </View>
             </View>
@@ -194,7 +206,9 @@ const MonthlyInvoice = ({ registros, cliente, month }) => {
               <Text style={styles.summaryTableCell}>Importe</Text>
             </View>
             <View style={styles.summaryTableCol}>
-              <Text style={styles.summaryTableCell}>{totalPrice.toFixed(2)} €</Text>
+              <Text style={styles.summaryTableCell}>
+                {totalPrice.toFixed(2)} €
+              </Text>
             </View>
           </View>
           <View style={styles.summaryTableRow}>
@@ -207,10 +221,14 @@ const MonthlyInvoice = ({ registros, cliente, month }) => {
           </View>
           <View style={styles.summaryTableRow}>
             <View style={styles.summaryTableCol}>
-              <Text style={[styles.summaryTableCell, styles.totalCell]}>Total</Text>
+              <Text style={[styles.summaryTableCell, styles.totalCell]}>
+                Total
+              </Text>
             </View>
             <View style={styles.summaryTableCol}>
-              <Text style={[styles.summaryTableCell, styles.totalCell]}>{totalWithIva.toFixed(2)} €</Text>
+              <Text style={[styles.summaryTableCell, styles.totalCell]}>
+                {totalWithIva.toFixed(2)} €
+              </Text>
             </View>
           </View>
         </View>

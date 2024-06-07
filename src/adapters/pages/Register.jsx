@@ -25,7 +25,7 @@ const Register = () => {
     event.preventDefault();
 
     try {
-      const response = await fetch(`http://localhost:8055/users`, {
+      await fetch(`http://localhost:8055/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -37,36 +37,6 @@ const Register = () => {
           email: mail,
         }),
       });
-
-      if (response.ok) {
-        console.log("Usuario creado exitosamente");
-        setUsername("");
-        setMail("");
-        setPassword("");
-        setUserCreatedMessage("Usuario creado correctamente");
-        setTimeout(() => setUserCreatedMessage(""), 5000);
-
-        const responseStaff = await fetch(`http://localhost:8055/items/staff`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            nombre: username,
-            cargo: "Staff",
-            correoElectronico: mail,
-          }),
-        });
-
-        if (responseStaff.ok) {
-          console.log("Operación añadir Staff realizada con éxito");
-        } else {
-          console.error(
-            "Error en la operación de añadir a Staff:",
-            responseStaff.statusText
-          );
-        }
-      }
     } catch (error) {
       if (error.response && error.response.status === 409) {
         setErrorMessage(

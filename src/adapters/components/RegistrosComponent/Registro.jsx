@@ -166,8 +166,12 @@ export default function Registro() {
       return false;
     }
     if (filterType === "cliente") {
-      const clienteMatch = registro.cliente.toLowerCase().includes(searchTerm.toLowerCase());
-      const monthMatch = filterMonth ? moment(registro.fecha_entrada).format("YYYY-MM") === filterMonth : true;
+      const clienteMatch = registro.cliente
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+      const monthMatch = filterMonth
+        ? moment(registro.fecha_entrada).format("YYYY-MM") === filterMonth
+        : true;
       return clienteMatch && monthMatch;
     } else if (filterType === "mes") {
       return moment(registro.fecha_entrada)
@@ -176,6 +180,14 @@ export default function Registro() {
         .includes(searchTerm.toLowerCase());
     } else if (filterType === "residuo") {
       return registro.residuo.toLowerCase().includes(searchTerm.toLowerCase());
+    } else if (filterType === "estado") {
+      return registro.estado.toLowerCase() === searchTerm.toLowerCase();
+    } else if (filterType === "año") {
+      return moment(registro.fecha_entrada)
+        .format("YYYY")
+        .includes(searchTerm.toLowerCase());
+    } else if (filterType === "matricula") {
+      return registro.matricula.toLowerCase() === searchTerm.toLowerCase();
     }
     return true;
   });
@@ -185,13 +197,15 @@ export default function Registro() {
       return false;
     }
     if (filterType === "cliente") {
-      const clienteMatch = registro.cliente.toLowerCase().includes(searchTerm.toLowerCase());
-      const monthMatch = moment(registro.fecha_entrada).format("YYYY-MM") === filterMonth;
+      const clienteMatch = registro.cliente
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+      const monthMatch =
+        moment(registro.fecha_entrada).format("YYYY-MM") === filterMonth;
       return clienteMatch && monthMatch;
     }
     return true;
   });
-  
 
   // Paginación de registros filtrados
   const paginatedRegistros = filteredRegistros.slice(
@@ -210,11 +224,15 @@ export default function Registro() {
 
   const handleGenerateMonthlyFactura = async (cliente, month) => {
     const registrosCliente = registros.filter(
-      (registro) => registro.cliente === cliente && moment(registro.fecha_entrada).format("YYYY-MM") === month
+      (registro) =>
+        registro.cliente === cliente &&
+        moment(registro.fecha_entrada).format("YYYY-MM") === month
     );
 
     if (registrosCliente.length === 0) {
-      console.warn("No hay registros para este cliente en el mes seleccionado.");
+      console.warn(
+        "No hay registros para este cliente en el mes seleccionado."
+      );
       return;
     }
 
@@ -223,7 +241,11 @@ export default function Registro() {
     try {
       const { url } = await new Promise((resolve, reject) => {
         const blob = pdf(
-          <MonthlyInvoice registros={registrosCliente} cliente={cliente} month={month} />
+          <MonthlyInvoice
+            registros={registrosCliente}
+            cliente={cliente}
+            month={month}
+          />
         ).toBlob();
 
         const url = URL.createObjectURL(blob);
@@ -252,7 +274,10 @@ export default function Registro() {
           <option value="cliente">Filtrar por Cliente</option>
           <option value="mes">Filtrar por Mes</option>
           <option value="residuo">Filtrar por Residuo</option>
-          </select>
+          <option value="año">Filtrar por Año</option>
+          <option value="matricula">Filtrar por Matricula</option>
+          <option value="estado">Filtrar por Facturado/No Facturado</option>
+        </select>
         <input
           type="text"
           placeholder="Buscar ..."
@@ -260,7 +285,7 @@ export default function Registro() {
           value={searchTerm}
           onChange={handleSearch}
         />
-        {filterType === "cliente" && (
+        {/* {filterType === "cliente" && (
           <input
             type="month"
             placeholder="Mes"
@@ -268,15 +293,15 @@ export default function Registro() {
             value={filterMonth}
             onChange={handleFilterMonthChange}
           />
-        )}
-        {filterType === "cliente" && (
+        )} */}
+        {/* {filterType === "cliente" && (
           <button
             onClick={() => handleGenerateMonthlyFactura(searchTerm, filterMonth)}
             className="py-2 px-4 bg-green-900 text-white rounded-lg ml-4"
           >
             Generar Factura Mensual
           </button>
-        )}
+        )} */}
       </div>
       <div className="flex flex-col">
         {Object.keys(groupedRegistros).map((date) => (

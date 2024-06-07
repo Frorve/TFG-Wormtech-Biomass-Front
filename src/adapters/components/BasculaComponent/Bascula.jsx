@@ -323,9 +323,19 @@ export default function Bascula() {
                 required
               >
                 <option value="">Seleccionar...</option>
-                <option value="Parking 1">Parking 1</option>
-                <option value="Parking 2">Parking 2</option>
-                <option value="Parking 3">Parking 3</option>
+                <option value="Parking 1 Residuos biodegradables">
+                  Parking 1 - Residuos biodegradables
+                </option>
+                <option value="Parking 2 Material de construcción">
+                  Parking 2 - Material de construcción
+                </option>
+                <option value="Parking 3 Plástico">Parking 3 - Plástico</option>
+                <option value="Parking 4 Tierra y piedras">
+                  Parking 4 - Tierra y piedras
+                </option>
+                <option value="Parking 5 Mezcla de residuos">
+                  Parking 5 - Mezcla de residuos
+                </option>
               </select>
             </div>
           )}

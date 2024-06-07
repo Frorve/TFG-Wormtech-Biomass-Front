@@ -65,6 +65,28 @@ const LoginForm = () => {
         localStorage.removeItem("rememberMe");
       }
 
+      // Registro de la hora de entrada
+      const operarioData = {
+        nombre: firstName,
+        entrada: new Date().toISOString(),
+      };
+
+      const response = await fetch("http://localhost:8055/items/operario", {
+        method: "POST",
+        // headers: {
+        //   "Content-Type": "application/json",
+        //   Authorization: `Bearer ${token}`,
+        // },
+        body: JSON.stringify(operarioData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al registrar la hora de entrada");
+      }
+
+      const result = await response.json();
+      localStorage.setItem("operarioId", result.data.id);
+
       navigate(`/home/${firstName}`);
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
@@ -120,21 +142,6 @@ const LoginForm = () => {
                 Contraseña
               </label>
             </div>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <label className="text-sm">
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={handleRememberMeChange}
-                className="mr-2"
-              />
-              Recuérdame
-            </label>
-            <Link to="/recuperar" className="text-sm text-black">
-              ¿Olvidaste la contraseña?
-            </Link>
           </div>
 
           {errorMessage && (

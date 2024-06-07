@@ -20,7 +20,11 @@ Características Principales:
 
 - Registro de Usuarios: Permite a los usuarios crear cuentas nuevas para acceder a la plataforma y gestionar la planta de reciclaje.
 
-- Dashboard Intuitiva: La interfaz de usuario incluye un dashboard intuitivo que proporciona una visión general de los diferentes aspectos de la planta, como el registro de entrada y salida de clientes, vista de clientes, vista de registros y generación de facturas.
+- Dashboard Intuitiva: La interfaz de usuario incluye un dashboard intuitivo que proporciona una visión general de los diferentes aspectos de la planta, como el registro de entrada y salida de clientes, vista de clientes y vista de registros.
+
+- Generación de Facturas: Puedes generar facturas de los registros de forma automatizada.
+
+- Generación de Certificados: Permite generar certificados de obra para los clientes de forma automatizada.
 
 ## Scripts Disponibles
 
@@ -140,7 +144,7 @@ Los registros cuentan con una paginación para no sobrecargar la página
 
 <img src="screenshots/FiltroRegistros.png">
 
-Permite filtrar por el buscador tanto por mes, cliente o tipo de residuo.
+Permite filtrar por el buscador tanto por mes, cliente, tipo de residuo, año, matricula y por factura/no facturado.
 
 ### Detalles del registro:
 
@@ -153,6 +157,30 @@ Pestaña modal que muestra información detallada del registro.
 <img src="screenshots/Factura.png">
 
 Al hacer click en el boton de generar factura se nos generará una factura PDF con los datos del registro, haciendo los cálculos de está de manera automática.
+
+### Certificados:
+
+<img src="screenshots/Certificados.png">
+
+En esta página se nos muestran todos los certificados que hemos emitido, y con funcionalidades como poder ver mas detalles del certificado y poder generar el PDF del mismo. También podemos usar el buscador de la parte superior para buscar un certificado en concreto.
+
+### Crear Certificados:
+
+<img src="screenshots/AddCertificados.png">
+
+Pestaña modal que nos permite crear un nuevo certificado rellenando los datos del formulario.
+
+### Detalles del Certificado:
+
+<img src="screenshots/DetallesCertificados.png">
+
+Al hacer click en "Ver más" se nos abriráesta pestaña modal que nos mostrara información detallada del certificado.
+
+### PDF del Certificado:
+
+<img src="screenshots/CertificadoPDF.png">
+
+Al hacer click en el boton de generar certificado se nos generará un certificado PDF con los datos del certificado, para poder entregarselo al cliente.
 
 ### ChatIA:
 

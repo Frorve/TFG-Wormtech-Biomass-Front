@@ -113,8 +113,22 @@ export default function Clientes() {
       });
       setShowAddModal(false);
       fetchEmpresas(); // Refrescar la lista de empresas después de añadir una nueva
+
+      Swal.fire({
+        icon: "success",
+        title: "¡Empresa añadida!",
+        text: "La empresa se ha añadido correctamente.",
+        confirmButtonText: "Aceptar",
+      });
     } catch (error) {
       console.error("Error al añadir cliente:", error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Hubo un problema al añadir la empresa. Por favor, inténtalo de nuevo más tarde.",
+        confirmButtonText: "Aceptar",
+      });
     }
   };
 
@@ -132,8 +146,22 @@ export default function Clientes() {
       );
       setShowEditModal(false);
       fetchEmpresas(); // Refrescar la lista de empresas después de actualizar una
+
+      Swal.fire({
+        icon: "success",
+        title: "¡Empresa actualizada!",
+        text: "La empresa se ha actualizado correctamente.",
+        confirmButtonText: "Aceptar",
+      });
     } catch (error) {
       console.error("Error al actualizar cliente:", error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Hubo un problema al actualizar la empresa. Por favor, inténtalo de nuevo más tarde.",
+        confirmButtonText: "Aceptar",
+      });
     }
   };
 
@@ -365,7 +393,14 @@ export default function Clientes() {
               </div>
               <div>
                 <small>Email</small>
-                <div className="font-bold">{selectedEmpresa.email}</div>
+                <div className="font-bold">
+                  <a
+                    href={`mailto:${selectedEmpresa.email}`}
+                    className="font-bold"
+                  >
+                    {selectedEmpresa.email}
+                  </a>
+                </div>
               </div>
             </div>
             <div className="modal-action">
