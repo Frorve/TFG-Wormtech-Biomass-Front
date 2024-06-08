@@ -299,7 +299,7 @@ export default function Bascula() {
             />
           </div>
           <div className="flex flex-col">
-            <label>Pesaje final:</label>
+            <label>Pesaje salida:</label>
             <input
               type="number"
               value={bascuPesajeFinal}
