@@ -197,6 +197,11 @@ export default function Bascula() {
 
   const handleRegistroSalida = async () => {
     if (!validateForm()) return;
+    if (bascuPesajeTotal < 0) {
+      setErrorMessage("El pesaje total no puede ser negativo.");
+      setTimeout(() => setErrorMessage(""), 3000);
+      return;
+    }
     const fechaActual = getCurrentTimeInSpain();
     try {
       const basculaInfo = {

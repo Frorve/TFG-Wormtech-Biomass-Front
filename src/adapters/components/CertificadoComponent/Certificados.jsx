@@ -182,7 +182,7 @@ export default function Certificados() {
           <option value="expediente">Expediente</option>
           <option value="nombre_promotor">Promotor</option>
           <option value="nombre_transportista">Transportista</option>
-          <option value="municipio">Municipio</option>
+          <option value="nombre_constructor">Constructor</option>
         </select>
 
         <input
