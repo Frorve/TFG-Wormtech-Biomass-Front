@@ -323,7 +323,7 @@ export default function Registro() {
                 <div className="flex-1 min-w-[150px] mr-2">
                   <small>Pesaje Total</small>
                   <div className="font-bold truncate">
-                    {registro.pesaje_total}
+                    {registro.pesaje_total} Kg
                   </div>
                 </div>
                 <div className="flex-1 min-w-[150px] mr-2">

@@ -47,6 +47,8 @@ export default function Clientes() {
       nombre: empresa.nombre,
       telefono: empresa.telefono,
       email: empresa.email,
+      direccion: empresa.direccion,
+      cp: empresa.cp,
     });
     setShowEditModal(true);
   };
