@@ -139,7 +139,7 @@ const Invoice = ({ registro }) => {
           </View>
           <View>
             <Text style={styles.facturaNumero}>
-              Número de factura: {invoiceNumber}
+              Número de factura: {registro.id}
             </Text>
             <View style={styles.datosCliente}>
               <Text>Fecha: {moment(registro.fecha_entrada).format("LL")}</Text>
