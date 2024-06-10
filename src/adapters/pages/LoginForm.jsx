@@ -7,20 +7,7 @@ const LoginForm = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-
-  useEffect(() => {
-    const storedUsername = localStorage.getItem("rememberedUsername");
-    const storedPassword = localStorage.getItem("rememberedPassword");
-    const storedRememberMe = localStorage.getItem("rememberMe");
-
-    if (storedUsername && storedPassword && storedRememberMe === "true") {
-      setUsername(storedUsername);
-      setPassword(storedPassword);
-      setRememberMe(true);
-    }
-  }, []);
 
   const handleUsernameChange = (event) => {
     setUsername(event.target.value);
@@ -28,10 +15,6 @@ const LoginForm = () => {
 
   const handlePasswordChange = (event) => {
     setPassword(event.target.value);
-  };
-
-  const handleRememberMeChange = () => {
-    setRememberMe(!rememberMe);
   };
 
   const handleSubmit = async (event) => {
@@ -54,16 +37,6 @@ const LoginForm = () => {
       const firstName = userData.data.first_name;
 
       localStorage.setItem("username", firstName);
-
-      if (rememberMe) {
-        localStorage.setItem("rememberedUsername", username);
-        localStorage.setItem("rememberedPassword", password);
-        localStorage.setItem("rememberMe", "true");
-      } else {
-        localStorage.removeItem("rememberedUsername");
-        localStorage.removeItem("rememberedPassword");
-        localStorage.removeItem("rememberMe");
-      }
 
       const operarioData = {
         nombre: firstName,

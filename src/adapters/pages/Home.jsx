@@ -6,6 +6,7 @@ import Clientes from "../components/ClienteComponent/Clientes";
 import Registro from "../components/RegistrosComponent/Registro";
 import Chat from "../components/ChatComponent/Chat";
 import Certificado from "../components/CertificadoComponent/Certificados";
+import Reports from "../components/ReportComponent/Reports";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -127,6 +128,14 @@ export default function Home() {
               Certificados
             </button>
           </li>
+          {/* <li className="mb-2">
+            <button
+              onClick={() => setView("reports")}
+              className="text-left w-full bg-green-200 py-2 px-4 rounded-lg"
+            >
+              Informes
+            </button>
+          </li> */}
         </ul>
       </div>
       <div className="flex-1 p-5">
@@ -138,6 +147,8 @@ export default function Home() {
               ? "Clientes"
               : view === "certificados"
               ? "Certificados"
+              : view === "reports"
+              ? "Reports"
               : "Registros"}
           </h1>
           <div className="flex items-center space-x-3">
@@ -170,6 +181,8 @@ export default function Home() {
           <Clientes />
         ) : view === "certificados" ? (
           <Certificado />
+        ) : view === "reports" ? (
+          <Reports />
         ) : (
           <Registro />
         )}

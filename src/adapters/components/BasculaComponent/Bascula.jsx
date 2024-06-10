@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Swal from "sweetalert2";
+
 
 export default function Bascula() {
   const [bascuCliente, setBascuCliente] = useState("");
@@ -170,6 +172,29 @@ export default function Bascula() {
         residuo: bascuResiduo,
       };
 
+      if (bascuMatricula.trim() === "") {
+        Swal.fire({
+          title: "Error",
+          text: "Por favor, completa el campo de Matrícula.",
+          icon: "error",
+        });
+        return;
+      } else if (bascuCliente.trim() === "") {
+        Swal.fire({
+          title: "Error",
+          text: "Por favor, completa el campo de Cliente.",
+          icon: "error",
+        });
+        return;
+      } else if (bascuPesajeInicial.trim() === "") {
+        Swal.fire({
+          title: "Error",
+          text: "Por favor, completa el campo de Pesaje Inicial.",
+          icon: "error",
+        });
+        return;
+      }
+
       const response = await axios.post(
         "http://localhost:8055/items/bascula",
         basculaInfo
@@ -213,6 +238,36 @@ export default function Bascula() {
         parking: bascuParking,
         residuo: bascuResiduo,
       };
+
+      if (bascuMatricula.trim() === "") {
+        Swal.fire({
+          title: "Error",
+          text: "Por favor, completa el campo de Matrícula.",
+          icon: "error",
+        });
+        return;
+      } else if (bascuCliente.trim() === "") {
+        Swal.fire({
+          title: "Error",
+          text: "Por favor, completa el campo de Cliente.",
+          icon: "error",
+        });
+        return;
+      } else if (bascuPesajeInicial.trim() === "") {
+        Swal.fire({
+          title: "Error",
+          text: "Por favor, completa el campo de Pesaje Inicial.",
+          icon: "error",
+        });
+        return;
+      } else if (bascuPesajeFinal.trim() === "") {
+        Swal.fire({
+          title: "Error",
+          text: "Por favor, completa el campo de Pesaje Salida.",
+          icon: "error",
+        });
+        return;
+      }
 
       const response = await axios.patch(
         `http://localhost:8055/items/bascula/${id}`,
