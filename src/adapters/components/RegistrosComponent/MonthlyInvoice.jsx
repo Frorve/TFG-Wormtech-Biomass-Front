@@ -112,8 +112,7 @@ const getPricePerTon = (residuo) => {
 };
 
 const generateInvoiceNumber = () => {
-  // Generate a random invoice number or implement your logic to generate it
-  return Math.floor(Math.random() * 1000000).toString(); // Example: generates a random 6-digit number
+  return Math.floor(Math.random() * 1000000).toString(); 
 };
 
 const MonthlyInvoice = ({ registros, cliente, month }) => {

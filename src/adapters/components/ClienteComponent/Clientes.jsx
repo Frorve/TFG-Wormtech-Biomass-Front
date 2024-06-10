@@ -14,6 +14,8 @@ export default function Clientes() {
     nombre: "",
     telefono: "",
     email: "",
+    direccion: "",
+    cp: "",
   });
 
   useEffect(() => {
@@ -280,6 +282,32 @@ export default function Clientes() {
                   />
                 </label>
               </div>
+              <div>
+                <label className="block">
+                  <span className="text-gray-400">Dirección</span>
+                  <input
+                    type="text"
+                    name="direccion"
+                    value={clientData.direccion}
+                    onChange={handleChange}
+                    className="input input-bordered input-sm w-full max-w-xs mt-1 block"
+                    required
+                  />
+                </label>
+              </div>
+              <div>
+                <label className="block">
+                  <span className="text-gray-400">Código Postal</span>
+                  <input
+                    type="text"
+                    name="cp"
+                    value={clientData.cp}
+                    onChange={handleChange}
+                    className="input input-bordered input-sm w-full max-w-xs mt-1 block"
+                    required
+                  />
+                </label>
+              </div>
               <div className="modal-action col-span-2">
                 <button
                   type="button"
@@ -357,6 +385,32 @@ export default function Clientes() {
                   />
                 </label>
               </div>
+              <div>
+                <label className="block">
+                  <span className="text-gray-400">Dirección</span>
+                  <input
+                    type="text"
+                    name="direccion"
+                    value={clientData.direccion}
+                    onChange={handleChange}
+                    className="input input-bordered input-sm w-full max-w-xs mt-1 block"
+                    required
+                  />
+                </label>
+              </div>
+              <div>
+                <label className="block">
+                  <span className="text-gray-400">Código Postal</span>
+                  <input
+                    type="text"
+                    name="cp"
+                    value={clientData.cp}
+                    onChange={handleChange}
+                    className="input input-bordered input-sm w-full max-w-xs mt-1 block"
+                    required
+                  />
+                </label>
+              </div>
               <div className="modal-action col-span-2">
                 <button
                   type="button"
@@ -401,6 +455,14 @@ export default function Clientes() {
                     {selectedEmpresa.email}
                   </a>
                 </div>
+              </div>
+              <div>
+                <small>Dirección</small>
+                <div className="font-bold">{selectedEmpresa.direccion}</div>
+              </div>
+              <div>
+                <small>Código Postal</small>
+                <div className="font-bold">{selectedEmpresa.cp}</div>
               </div>
             </div>
             <div className="modal-action">

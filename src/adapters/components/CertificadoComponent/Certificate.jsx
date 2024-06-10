@@ -13,12 +13,11 @@ import regular from "../../../fonts/Poppins-Regular.ttf";
 import bold from "../../../fonts/Poppins-Bold.ttf";
 import logo from "../../../assets/logo.png";
 
-// Registra la fuente Poppins
 Font.register({
   family: "Poppins",
   fonts: [
-    { src: regular }, // Poppins regular
-    { src: bold, fontWeight: "bold" }, // Poppins bold
+    { src: regular }, 
+    { src: bold, fontWeight: "bold" },
   ],
 });
 

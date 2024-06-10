@@ -13,12 +13,11 @@ import logo from "../../../assets/logo.png";
 import regular from "../../../fonts/Poppins-Regular.ttf";
 import bold from "../../../fonts/Poppins-Bold.ttf";
 
-// Registra la fuente Poppins
 Font.register({
   family: "Poppins",
   fonts: [
-    { src: regular }, // Poppins regular
-    { src: bold, fontWeight: "bold" }, // Poppins bold
+    { src: regular },
+    { src: bold, fontWeight: "bold" },
   ],
 });
 
@@ -214,12 +213,12 @@ const Invoice = ({ registro }) => {
         </View>
         <View>
           <Text style={styles.pago}>
-            El pago se realizará en un plazo máximo de tres meses desde la
+            El pago se realizará en un plazo máximo de dos meses desde la
             emisión de esta factura, se realizará mediante transferencia
             bancaria.
           </Text>
           <Text style={styles.cuenta}>
-            Número de cuenta: ES24 3245 6789 2000 0056
+            Número de cuenta: ES77 2100 5317 5713 0010 4885
           </Text>
         </View>
       </Page>

@@ -65,7 +65,6 @@ const LoginForm = () => {
         localStorage.removeItem("rememberMe");
       }
 
-      // Registro de la hora de entrada
       const operarioData = {
         nombre: firstName,
         entrada: new Date().toISOString(),

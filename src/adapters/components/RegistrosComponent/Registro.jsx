@@ -68,7 +68,7 @@ export default function Registro() {
           },
         }
       );
-      return response.data.data.id; // Devuelve el ID del archivo subido
+      return response.data.data.id;
     } catch (error) {
       console.error("Error al subir el archivo PDF:", error);
       throw error;
@@ -102,7 +102,6 @@ export default function Registro() {
     await updateRegistroEstado(registro);
 
     try {
-      // Usar BlobProvider para obtener el blob del PDF
       const { url } = await new Promise((resolve, reject) => {
         <BlobProvider document={<Invoice registro={registro} />}>
           {({ blob, url, loading, error }) => {
@@ -125,7 +124,7 @@ export default function Registro() {
 
       console.log("PDF generado y preparado para subir:", file);
 
-      // Subir el archivo PDF a Directus y obtener el ID del archivo
+      // Subir el archivo PDF a Directus
       const fileId = await uploadPDF(file);
 
       console.log("ID del archivo subido:", fileId);
@@ -145,8 +144,8 @@ export default function Registro() {
   const saveFactura = async (registro, fileId) => {
     try {
       const facturaData = {
-        estado: "No pagada", // Puedes ajustar esto según tu lógica
-        factura: fileId, // Guardar el ID del archivo PDF generado
+        estado: "No pagada", 
+        factura: fileId, 
         empresa: registro.cliente,
         fecha: new Date().toISOString(),
       };
@@ -207,7 +206,6 @@ export default function Registro() {
     return true;
   });
 
-  // Paginación de registros filtrados
   const paginatedRegistros = filteredRegistros.slice(
     (page - 1) * pageSize,
     page * pageSize
