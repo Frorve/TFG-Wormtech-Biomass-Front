@@ -3,7 +3,7 @@
 </p>
 
 <h1 align="center">
-React Application Wormtech Biomass - TFG | Fran - Javi - Alex
+React Application Wormtech Biomass - TFG
 </h1>
 
 # Empieza con Create React App
